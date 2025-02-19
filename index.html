@@ -8,7 +8,7 @@
     <style>
         /* Ajout du style pour l'email en haut de page */
         .email-display {
-            color: white; /* Texte blanc pour être visible sur fond sombre */
+            color: black; /* Texte noir pour l'email */
             font-weight: bold;
         }
     </style>
@@ -55,8 +55,9 @@
             if (user) {
                 console.log("✅ Utilisateur connecté :", user.email);
 
-                // Afficher l'email dans la page
+                // Afficher l'email dans la page avec texte noir
                 document.getElementById('user-email').textContent = `👤 ${user.email}`;
+                document.getElementById('user-email').style.color = 'black'; // Changer la couleur du texte de l'email
 
                 // Récupérer les infos de l'utilisateur dans Firestore
                 const userRef = doc(db, "users", user.uid);
@@ -90,7 +91,6 @@
 
             if (email) {
                 navContainer.innerHTML = `
-                    <span>👤 ${email}</span>
                     <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
                     <button onclick="window.location.href='account.html'" class="btn">My Account</button>
                     <button onclick="logout()" class="btn">Log out</button>
@@ -132,7 +132,7 @@
                 const downloadButton = document.createElement('button');
                 if (game.premium && !isPremium) {
                     downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
+                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium si l'utilisateur n'est pas premium
                 } else {
                     downloadButton.textContent = "Download";
                     downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
