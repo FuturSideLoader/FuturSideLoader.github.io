@@ -1,3 +1,4 @@
+<!-- Forcing GitHub Pages update -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +44,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Vérification de l'utilisateur connecté et du statut premium
+        // VÃ©rification de l'utilisateur connectÃ© et du statut premium
         onAuthStateChanged(auth, async (user) => {
             const loginButton = document.getElementById("login-btn");
             const signupButton = document.getElementById("signup-btn");
@@ -51,19 +52,19 @@
             const myAccountButton = document.getElementById("my-account-btn");
 
             if (user) {
-                // Si l'utilisateur est connecté, masquer les boutons Log in et Create account
+                // Si l'utilisateur est connectÃ©, masquer les boutons Log in et Create account
                 loginButton.style.display = "none";
                 signupButton.style.display = "none";
 
-                // Vérifier le statut premium de l'utilisateur
+                // VÃ©rifier le statut premium de l'utilisateur
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
-                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier si premium
+                    const isPremium = userData.subscriptionStatus === "Premium"; // VÃ©rifier si premium
 
-                    console.log("User is premium: " + isPremium); // Vérification
+                    console.log("User is premium: " + isPremium); // VÃ©rification
 
                     // Si l'utilisateur est premium, cacher le bouton "Pay for Premium"
                     if (isPremium) {
@@ -73,13 +74,13 @@
                     }
                 } else {
                     console.log("User document not found!");
-                    premiumButton.style.display = "inline-block"; // Si aucune donnée, afficher le bouton
+                    premiumButton.style.display = "inline-block"; // Si aucune donnÃ©e, afficher le bouton
                 }
 
                 // Afficher le bouton My Account
                 myAccountButton.style.display = "inline-block";
             } else {
-                // Si l'utilisateur n'est pas connecté, afficher les boutons Log in et Create account
+                // Si l'utilisateur n'est pas connectÃ©, afficher les boutons Log in et Create account
                 loginButton.style.display = "inline-block";
                 signupButton.style.display = "inline-block";
 
