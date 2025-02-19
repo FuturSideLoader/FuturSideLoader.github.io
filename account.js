@@ -58,7 +58,6 @@ window.onload = function () {
     // Attacher l'événement de déconnexion
     document.getElementById("logout-btn").addEventListener("click", logout);
     document.getElementById("pay-for-premium").addEventListener("click", payForPremium);
-    document.getElementById("confirm-premium").addEventListener("click", confirmPremium);
 };
 
 // Fonction de déconnexion
@@ -76,15 +75,4 @@ function payForPremium() {
 }
 
 // Confirme le statut Premium après le paiement
-async function confirmPremium() {
-    const user = auth.currentUser;
-    if (user) {
-        const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, {
-            subscriptionStatus: "Premium"
-        });
-        document.getElementById("subscription-status").innerText = "Premium";
-        document.getElementById("pay-for-premium").style.display = "none";
-        document.getElementById("confirm-premium").style.display = "none";
-    }
-}
+
