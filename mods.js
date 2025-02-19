@@ -49,7 +49,7 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         console.log("? User is logged in. Loading mods...");
-        loadMods();
+        loadMods(userSnap.data().premium);
 
     } catch (error) {
         console.error("? Error checking user status:", error);
@@ -59,7 +59,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // Charger les mods depuis le fichier JSON
-async function loadMods() {
+async function loadMods(isPremiumUser) {
     console.log("Starting loadMods()...");
 
     try {
@@ -85,11 +85,19 @@ async function loadMods() {
             const modElement = document.createElement("div");
             modElement.classList.add("mod-item");
 
-            modElement.innerHTML = `
-                <h2>${mod.name}</h2>
-                <p>${mod.description}</p>
-                <a href="${mod.download}" class="btn">Download</a>
-            `;
+            if (mod.premium && !isPremiumUser) {
+                modElement.innerHTML = `
+                    <h2>${mod.name}</h2>
+                    <p>${mod.description}</p>
+                    <button class="btn" disabled>Premium Access Required</button>
+                `;
+            } else {
+                modElement.innerHTML = `
+                    <h2>${mod.name}</h2>
+                    <p>${mod.description}</p>
+                    <a href="${mod.download}" class="btn">Download</a>
+                `;
+            }
 
             modsContainer.appendChild(modElement);
         });
