@@ -65,7 +65,7 @@ function logout() {
 
 // Redirige vers Stripe
 function payForPremium() {
-    window.location.href = "https://buy.stripe.com/8wM4hnc95exIfDO288";
+    window.location.href = "https://buy.stripe.com/test_8wMbJP7wn0oB58YaEE";
 }
 
 // Confirme le Premium après le paiement
