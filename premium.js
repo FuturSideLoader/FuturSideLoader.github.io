@@ -21,7 +21,7 @@ async function loadPremiumGames() {
             gameCard.innerHTML = `
                 <img src="${game.cover}" alt="${game.name} Cover">
                 <h2>${game.name}</h2>
-                <button onclick="downloadGame('${game.url}')">Download</button>
+                <button onclick="downloadGame('${game.download}')">Download</button>
             `;
 
             container.appendChild(gameCard);
