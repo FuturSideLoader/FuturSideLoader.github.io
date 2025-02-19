@@ -112,3 +112,48 @@ main {
     background-color: #d3d3d3;
     cursor: not-allowed;
 }
+
+/* Footer */
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+}
+
+.footer-left {
+    display: flex;
+    gap: 10px;
+}
+
+.footer-link {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.footer-link:hover {
+    color: #0056b3;
+}
+
+.footer-center {
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* Footer Responsive Design */
+@media screen and (max-width: 600px) {
+    footer {
+        flex-direction: column;
+        text-align: center;
+    }
+    .footer-left {
+        margin-bottom: 10px;
+    }
+}
