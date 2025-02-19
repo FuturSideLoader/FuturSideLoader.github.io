@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Mod 1",
+        "description": "This is the first mod description.",
+        "download": "https://example.com/mod1.zip",
+        "premium": true
+    },
+    {
+        "name": "Mod 2",
+        "description": "This is the second mod description.",
+        "download": "https://example.com/mod2.zip",
+        "premium": false
+    },
+    {
+        "name": "Mod 3",
+        "description": "This is the third mod description.",
+        "download": "https://example.com/mod3.zip",
+        "premium": true
+    }
+]

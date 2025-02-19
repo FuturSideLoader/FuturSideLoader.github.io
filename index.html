@@ -7,15 +7,88 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Download Your Games</h1>
-    <div id="game-list">
-        <button class="game-btn" onclick="downloadGame('game1')">Download Game 1</button>
-        <button class="game-btn" onclick="downloadGame('game2')">Download Game 2</button>
-    </div>
+    <header>
+        <div class="nav-container">
+            <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
+            <button id="login-btn" onclick="window.location.href='login.html'" class="btn">Log in</button>
+            <button id="signup-btn" onclick="window.location.href='signup.html'" class="btn">Create account</button>
+            <button id="premium-btn" onclick="window.location.href='account.html'" class="btn">Pay for Premium</button>
+            <button id="my-account-btn" onclick="window.location.href='account.html'" class="btn">My Account</button> <!-- Ajout du bouton My Account -->
+        </div>
+    </header>
 
-    <div id="auth">
-        <button onclick="login()">Login to Access Premium</button>
-    </div>
+    <main>
+        <h1>Welcome to FutureSideloader</h1>
+        <div id="game-container"></div>
+    </main>
+
+    <!-- Firebase SDKs (Version modulaire) -->
+    <script type="module">
+        // Configuration Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
+            authDomain: "futursideloader.firebaseapp.com",
+            projectId: "futursideloader",
+            storageBucket: "futursideloader.firebasestorage.app",
+            messagingSenderId: "426216859785",
+            appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
+        };
+        
+        // Initialisation Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Vérification de l'utilisateur connecté et du statut premium
+        onAuthStateChanged(auth, async (user) => {
+            const loginButton = document.getElementById("login-btn");
+            const signupButton = document.getElementById("signup-btn");
+            const premiumButton = document.getElementById("premium-btn");
+            const myAccountButton = document.getElementById("my-account-btn");
+
+            if (user) {
+                // Si l'utilisateur est connecté, masquer les boutons Log in et Create account
+                loginButton.style.display = "none";
+                signupButton.style.display = "none";
+
+                // Vérifier le statut premium de l'utilisateur
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier si premium
+
+                    console.log("User is premium: " + isPremium); // Vérification
+
+                    // Si l'utilisateur est premium, cacher le bouton "Pay for Premium"
+                    if (isPremium) {
+                        premiumButton.style.display = "none";
+                    } else {
+                        premiumButton.style.display = "inline-block";
+                    }
+                } else {
+                    console.log("User document not found!");
+                    premiumButton.style.display = "inline-block"; // Si aucune donnée, afficher le bouton
+                }
+
+                // Afficher le bouton My Account
+                myAccountButton.style.display = "inline-block";
+            } else {
+                // Si l'utilisateur n'est pas connecté, afficher les boutons Log in et Create account
+                loginButton.style.display = "inline-block";
+                signupButton.style.display = "inline-block";
+
+                // Masquer les boutons My Account et Premium
+                myAccountButton.style.display = "none";
+                premiumButton.style.display = "none";
+            }
+        });
+    </script>
 
     <script src="script.js"></script>
 </body>

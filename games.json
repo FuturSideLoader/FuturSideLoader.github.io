@@ -1,0 +1,18 @@
+[
+    {
+        "id": "game1",
+        "name": "Super Adventure",
+        "cover": "images/game1-cover.jpg",
+        "screenshots": [],
+        "download": "https://yourdownloadlink.com/game1",
+        "premium": false
+    },
+    {
+        "id": "game2",
+        "name": "Super Adventure 2",
+        "cover": "images/game1-cover.jpg",
+        "screenshots": [],
+        "download": "https://example.com/game1.html",
+        "premium": true
+    }
+]

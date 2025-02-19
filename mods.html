@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mods</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <button onclick="window.location.href='index.html'" class="btn">Home</button>
+            <button onclick="window.location.href='account.html'" class="btn">My Account</button>
+            <button onclick="logout()" class="btn">Log out</button>
+        </div>
+    </header>
+
+    <main>
+        <h1>Available Mods</h1>
+        <div id="mods-container"></div>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+    <!-- Custom script -->
+    <script type="module" src="mods.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Checkout for Premium Subscription</h1>
+    <button id="pay-for-premium">Pay for Premium</button>
+
+    <!-- Inclure Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Remplace par ta clé publique Stripe
+        const stripe = Stripe('pk_live_51Qu1olA4g1BtrBe4rg0PGvlOXJzoT9cTURXkMJ8mdiUJO2tNVw2IcbJBn7PJkMFLkW19J7CHS7oWIGRnLcRwctKw000g9Lilqg');
+
+        document.getElementById('pay-for-premium').addEventListener('click', function() {
+            // Créer une session de paiement
+            fetch('https://futursideloader.netlify.app/.netlify/functions/create-checkout-session', { method: 'POST' })  // Remplace par ton URL pour créer la session
+                .then((response) => response.json())
+                .then((sessionId) => {
+                    stripe.redirectToCheckout({ sessionId: sessionId.id });
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la création de la session de paiement:", error);
+                });
+        });
+    </script>
+</body>
+</html>
