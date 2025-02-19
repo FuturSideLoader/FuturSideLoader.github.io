@@ -67,6 +67,8 @@
         <p>Status: <span id="subscription-status"></span></p>
         <button id="toggle-subscription" onclick="toggleSubscription()">Subscribe</button>
         <button id="pay-for-premium" onclick="payForPremium()" style="display:none;">Pay for Premium</button>
+        <!-- Bouton pour confirmer après paiement -->
+        <button id="confirm-premium" style="display: none;">Confirm Premium</button>
         <button id="logout-btn" style="display: none;">Logout</button>
     </main>
 
@@ -75,7 +77,7 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
 
-    <!-- Ton script personnalis� -->
+    <!-- Ton script personnalisé -->
     <script type="module" src="account.js"></script>
 </body>
 </html>
