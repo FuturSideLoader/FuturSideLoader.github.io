@@ -9,8 +9,7 @@
 <body>
     <header>
         <div class="nav-container">
-            <button onclick="window.location.href='login.html'" class="btn">Log in</button>
-            <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
+            <!-- Les boutons seront mis à jour par le script -->
         </div>
     </header>
 
@@ -41,34 +40,69 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Fonction pour afficher les jeux
-        async function loadGames() {
-            const response = await fetch('games.json');
-            const games = await response.json();
+        // Vérifier l'état de connexion de l'utilisateur
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("✅ Utilisateur connecté :", user.email);
 
-            // Vérifier si l'utilisateur est connecté
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // L'utilisateur est connecté, vérifier son statut premium
-                    const userRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(userRef);
+                // Récupérer les infos de l'utilisateur dans Firestore
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
 
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
-
-                        // Afficher les jeux avec le bon statut premium
-                        displayGames(games, isPremium);
-                    }
-                } else {
-                    // Utilisateur non connecté : Tous les jeux sont désactivés
-                    displayGames(games, false); // Utilisateur non premium par défaut
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
+                    
+                    // Sauvegarde du statut premium
+                    localStorage.setItem("premium", isPremium);
+                    
+                    // Mettre à jour l'interface utilisateur
+                    updateUI(user.email);
+                    // Afficher les jeux
+                    loadGames(isPremium);
                 }
+            } else {
+                console.log("❌ Aucun utilisateur connecté !");
+                localStorage.setItem("premium", "false");
+                updateUI(null);
+                // Afficher les jeux en mode non premium
+                loadGames(false);
+            }
+        });
+
+        // Mettre à jour l'interface utilisateur en fonction du statut de l'utilisateur
+        function updateUI(email) {
+            const navContainer = document.querySelector(".nav-container");
+            navContainer.innerHTML = ""; // Vider le conteneur avant d'ajouter
+
+            if (email) {
+                navContainer.innerHTML = `
+                    <span>👤 ${email}</span>
+                    <button onclick="logout()" class="btn">Log out</button>
+                `;
+            } else {
+                navContainer.innerHTML = `
+                    <button onclick="window.location.href='login.html'" class="btn">Log in</button>
+                    <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
+                `;
+            }
+        }
+
+        // Fonction de déconnexion
+        function logout() {
+            auth.signOut().then(() => {
+                console.log("🚪 Déconnecté !");
+                window.location.reload();
+            }).catch(error => {
+                console.error("❌ Erreur de déconnexion :", error);
             });
         }
 
-        // Fonction pour afficher les jeux dans le conteneur
-        function displayGames(games, isPremium) {
+        // Fonction pour afficher les jeux
+        async function loadGames(isPremium) {
+            const response = await fetch('games.json');
+            const games = await response.json();
+
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = ''; // Réinitialiser le conteneur
 
@@ -97,8 +131,6 @@
             });
         }
 
-        // Charger les jeux lorsque la page est prête
-        loadGames();
     </script>
 
     <script src="script.js"></script>
