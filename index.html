@@ -9,16 +9,20 @@
 <body>
     <header>
         <div class="nav-container">
-            <span id="user-email" style="color: white;"></span> <!-- Affichage de l'email -->
-            <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
-            <button onclick="window.location.href='account.html'" class="btn">My account</button>
             <button onclick="window.location.href='login.html'" class="btn">Log in</button>
             <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
+            <!-- Ajouter les nouveaux boutons -->
+            <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
+            <button onclick="window.location.href='account.html'" class="btn">My Account</button>
         </div>
     </header>
 
     <main>
         <h1>Welcome to FutureSideloader</h1>
+
+        <!-- Affichage de l'email de l'utilisateur connecté -->
+        <div id="user-email"></div>
+
         <div id="game-container"></div> <!-- Conteneur pour les jeux -->
     </main>
 
@@ -44,38 +48,38 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Fonction pour vérifier l'état de connexion et récupérer le statut premium
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // L'utilisateur est connecté, récupérer son statut premium
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut premium
-
-                    // Mettre à jour localStorage avec le statut premium
-                    localStorage.setItem("premium", isPremium ? "true" : "false");
-
-                    // Afficher l'email de l'utilisateur
-                    document.getElementById('user-email').textContent = `👤 ${user.email}`;
-                    console.log("Utilisateur premium:", isPremium);
-                }
-            } else {
-                // Si l'utilisateur n'est pas connecté, on met premium à false
-                localStorage.setItem("premium", "false");
-            }
-        });
-
         // Fonction pour afficher les jeux
-        async function loadGames() {
+        async function loadGames(isPremium) {
             const response = await fetch('games.json');
             const games = await response.json();
 
-            // Vérifier si l'utilisateur est premium
-            const isPremium = localStorage.getItem("premium") === "true";
+            // Vérifier si l'utilisateur est connecté
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // L'utilisateur est connecté, récupérer son email et afficher les jeux premium ou non
+                    document.getElementById('user-email').textContent = `👤 ${user.email}`;
+                    document.getElementById('user-email').style.color = "black"; // Couleur de l'email en noir
 
+                    // Vérifier le statut premium de l'utilisateur dans Firestore
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        const isPremiumUser = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
+
+                        // Afficher les jeux en fonction du statut premium
+                        displayGames(games, isPremiumUser);
+                    }
+                } else {
+                    // Utilisateur non connecté, ne pas afficher de jeux premium
+                    displayGames(games, false);
+                }
+            });
+        }
+
+        // Fonction pour afficher les jeux dans le conteneur
+        function displayGames(games, isPremium) {
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = ''; // Réinitialiser le conteneur
 
@@ -104,7 +108,7 @@
             });
         }
 
-        // Charger les jeux au chargement de la page
+        // Charger les jeux lorsque la page est prête
         loadGames();
     </script>
 
