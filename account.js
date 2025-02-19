@@ -41,7 +41,7 @@ window.onload = function () {
                 }
             }
 
-            // Afficher le bouton "Logout"
+            // Vérifier si le bouton "Logout" existe avant de manipuler son style
             const logoutButton = document.getElementById("logout-btn");
             if (logoutButton) {
                 logoutButton.style.display = "inline-block"; // S'assurer qu'il est visible
@@ -81,5 +81,3 @@ function payForPremium() {
     const cancelUrl = "https://futursideloader.github.io/cancel.html";
     window.location.href = "https://buy.stripe.com/test_8wMbJP7wn0oB58YaEE";
 }
-
-// Confirme le statut Premium après le paiement
