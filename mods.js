@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-// ?? Initialisation Firebase
+// Initialisation Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
     authDomain: "futursideloader.firebaseapp.com",
@@ -17,17 +17,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ? Vérification de Firestore
+// VÃ©rification de Firestore
 if (!db) {
-    console.error("Firestore n'a pas pu être initialisé !");
+    console.error("Firestore n'a pas pu Ãªtre initialisÃ© !");
 } else {
-    console.log("Firestore initialisé avec succès !");
+    console.log("Firestore initialisÃ© avec succÃ¨s !");
 }
 
-// ?? Variable pour stocker le statut premium
-let isPremiumUser = false;
-
-// ??? Vérifier l'état de l'utilisateur et son statut premium
+// VÃ©rifier l'Ã©tat de l'utilisateur
 onAuthStateChanged(auth, async (user) => {
     console.log("Checking authentication status...");
 
@@ -51,29 +48,19 @@ onAuthStateChanged(auth, async (user) => {
             return;
         }
 
-        isPremiumUser = userSnap.data().premium;
-        console.log("Premium status:", isPremiumUser);
-
-        if (!isPremiumUser) {
-            console.log("User is not premium. Redirecting...");
-            alert("You need a premium account to access mods.");
-            window.location.href = "index.html";
-            return;
-        }
-
-        console.log("? User is premium. Loading mods...");
+        console.log("? User is logged in. Loading mods...");
         loadMods();
 
     } catch (error) {
-        console.error("? Error checking premium status:", error);
+        console.error("? Error checking user status:", error);
         alert("An error occurred. Please try again later.");
         window.location.href = "index.html";
     }
 });
 
-// ?? Charger les mods depuis le fichier JSON
+// Charger les mods depuis le fichier JSON
 async function loadMods() {
-    console.log("?? Starting loadMods()...");
+    console.log("Starting loadMods()...");
 
     try {
         console.log("Fetching mods.json...");
@@ -84,12 +71,12 @@ async function loadMods() {
         }
 
         const mods = await response.json();
-        console.log("? Mods loaded successfully:", mods);
+        console.log("Mods loaded successfully:", mods);
 
-        // ?? Vérification de l'élément mods-container
+        // VÃ©rification de l'Ã©lÃ©ment mods-container
         const modsContainer = document.getElementById("mods-container");
         if (!modsContainer) {
-            throw new Error("? Element #mods-container not found in the DOM.");
+            throw new Error("Element #mods-container not found in the DOM.");
         }
 
         modsContainer.innerHTML = ""; // Nettoyer avant d'ajouter les mods
@@ -98,27 +85,19 @@ async function loadMods() {
             const modElement = document.createElement("div");
             modElement.classList.add("mod-item");
 
-            if (mod.premium && !isPremiumUser) {
-                modElement.innerHTML = `
-                    <h2>${mod.name}</h2>
-                    <p>${mod.description}</p>
-                    <button class="btn" disabled>Premium Access Required</button>
-                `;
-            } else {
-                modElement.innerHTML = `
-                    <h2>${mod.name}</h2>
-                    <p>${mod.description}</p>
-                    <a href="${mod.download}" class="btn">Download</a>
-                `;
-            }
+            modElement.innerHTML = `
+                <h2>${mod.name}</h2>
+                <p>${mod.description}</p>
+                <a href="${mod.download}" class="btn">Download</a>
+            `;
 
             modsContainer.appendChild(modElement);
         });
 
-        console.log("? Mods successfully loaded and displayed.");
+        console.log("Mods successfully loaded and displayed.");
 
     } catch (error) {
-        console.error("? Error loading mods:", error);
+        console.error("Error loading mods:", error);
         alert("Failed to load mods. Please try again later.");
     }
 }
