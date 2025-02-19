@@ -9,32 +9,23 @@
 <body>
     <header>
         <div class="nav-container">
-            <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
-            <button id="login-btn" onclick="window.location.href='login.html'" class="btn">Log in</button>
-            <button id="signup-btn" onclick="window.location.href='signup.html'" class="btn">Create account</button>
-            <button id="premium-btn" onclick="window.location.href='account.html'" class="btn">Pay for Premium</button>
-            <button id="my-account-btn" onclick="window.location.href='account.html'" class="btn">My Account</button> <!-- Ajout du bouton My Account -->
+            <button onclick="window.location.href='login.html'" class="btn">Log in</button>
+            <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
         </div>
     </header>
 
     <main>
         <h1>Welcome to FutureSideloader</h1>
-        <div id="game-container">
-            <!-- Exemple de jeu avec téléchargement premium -->
-            <div class="game-item">
-                <h2>Premium Game 1</h2>
-                <button class="download-btn" id="download-btn-1">Upgrade to a paid plan to download</button>
-            </div>
-        </div>
+        <div id="game-container"></div> <!-- Conteneur pour les jeux -->
     </main>
 
-    <!-- Firebase SDKs (Version modulaire) -->
+    <!-- Firebase SDK -->
     <script type="module">
-        // Configuration Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        
+
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
             authDomain: "futursideloader.firebaseapp.com",
@@ -43,67 +34,81 @@
             messagingSenderId: "426216859785",
             appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
         };
-        
-        // Initialisation Firebase
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        // Vérification de l'utilisateur connecté et du statut premium
-        onAuthStateChanged(auth, async (user) => {
-            const loginButton = document.getElementById("login-btn");
-            const signupButton = document.getElementById("signup-btn");
-            const premiumButton = document.getElementById("premium-btn");
-            const myAccountButton = document.getElementById("my-account-btn");
 
-            if (user) {
-                // Si l'utilisateur est connecté, masquer les boutons Log in et Create account
-                loginButton.style.display = "none";
-                signupButton.style.display = "none";
+        // Fonction pour afficher les jeux
+        async function loadGames() {
+            const response = await fetch('games.json');
+            const games = await response.json();
 
-                // Vérifier le statut premium de l'utilisateur
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
+            // Vérifier l'utilisateur et son statut premium
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // L'utilisateur est connecté, vérifier son statut premium
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
 
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier si premium
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier si l'utilisateur est premium
 
-                    // Si l'utilisateur est premium, cacher le bouton "Pay for Premium"
-                    if (isPremium) {
-                        premiumButton.style.display = "none";
+                        // Afficher les jeux avec le bon statut premium
+                        const gameContainer = document.getElementById('game-container');
+                        gameContainer.innerHTML = ''; // Réinitialiser le conteneur
 
-                        // Modifier les boutons de téléchargement des jeux premium
-                        document.querySelectorAll('.download-btn').forEach((button) => {
-                            button.textContent = "Download";
-                            button.disabled = false; // Activer le bouton de téléchargement
-                        });
-                    } else {
-                        premiumButton.style.display = "inline-block";
+                        games.forEach(game => {
+                            const gameItem = document.createElement('div');
+                            gameItem.classList.add('game-item');
 
-                        // Modifier les boutons de téléchargement pour les utilisateurs non premium
-                        document.querySelectorAll('.download-btn').forEach((button) => {
-                            button.textContent = "Upgrade to a paid plan to download";
-                            button.disabled = true; // Désactiver le bouton de téléchargement
+                            const gameTitle = document.createElement('h2');
+                            gameTitle.textContent = game.name;
+                            gameItem.appendChild(gameTitle);
+
+                            const downloadButton = document.createElement('button');
+                            if (game.premium && !isPremium) {
+                                downloadButton.textContent = "Upgrade to a paid plan to download";
+                                downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
+                            } else {
+                                downloadButton.textContent = "Download";
+                                downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
+                                downloadButton.onclick = () => {
+                                    window.location.href = game.url; // Lancer le téléchargement
+                                };
+                            }
+
+                            gameItem.appendChild(downloadButton);
+                            gameContainer.appendChild(gameItem);
                         });
                     }
+                } else {
+                    // Utilisateur non connecté : tous les boutons de téléchargement sont désactivés
+                    const gameContainer = document.getElementById('game-container');
+                    gameContainer.innerHTML = ''; // Réinitialiser le conteneur
+
+                    games.forEach(game => {
+                        const gameItem = document.createElement('div');
+                        gameItem.classList.add('game-item');
+
+                        const gameTitle = document.createElement('h2');
+                        gameTitle.textContent = game.name;
+                        gameItem.appendChild(gameTitle);
+
+                        const downloadButton = document.createElement('button');
+                        downloadButton.textContent = "Log in to download";
+                        downloadButton.disabled = true; // Désactiver le bouton
+                        gameItem.appendChild(downloadButton);
+
+                        gameContainer.appendChild(gameItem);
+                    });
                 }
-            } else {
-                // Si l'utilisateur n'est pas connecté, afficher les boutons Log in et Create account
-                loginButton.style.display = "inline-block";
-                signupButton.style.display = "inline-block";
+            });
+        }
 
-                // Masquer les boutons My Account et Premium
-                myAccountButton.style.display = "none";
-                premiumButton.style.display = "none";
-
-                // Désactiver les boutons de téléchargement
-                document.querySelectorAll('.download-btn').forEach((button) => {
-                    button.textContent = "Upgrade to a paid plan to download";
-                    button.disabled = true;
-                });
-            }
-        });
+        // Charger les jeux lorsque la page est prête
+        loadGames();
     </script>
 
     <script src="script.js"></script>
