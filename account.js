@@ -17,7 +17,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.onload = function () {
+// Attendre que le DOM soit complètement chargé avant d'exécuter le code
+document.addEventListener("DOMContentLoaded", function () {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             document.getElementById("email").innerText = user.email;
@@ -64,7 +65,7 @@ window.onload = function () {
 
     // Attacher le clic pour payer pour Premium ici si nécessaire
     document.getElementById("pay-for-premium").addEventListener("click", payForPremium);
-};
+});
 
 // Fonction de déconnexion
 function logout() {
