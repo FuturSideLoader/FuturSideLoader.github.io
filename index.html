@@ -21,10 +21,12 @@
 
     <!-- Firebase SDK -->
     <script type="module">
+        // Importer Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
             authDomain: "futursideloader.firebaseapp.com",
@@ -34,41 +36,39 @@
             appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
         };
 
+        // Initialisation Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let isPremium = false; // Par défaut, l'utilisateur n'est pas premium
+        // Fonction pour afficher les jeux
+        async function loadGames() {
+            const response = await fetch('games.json');
+            const games = await response.json();
 
-        async function checkUserStatus() {
-            return new Promise((resolve, reject) => {
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        const userRef = doc(db, "users", user.uid);
-                        const userSnap = await getDoc(userRef);
+            // Vérifier si l'utilisateur est connecté
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // L'utilisateur est connecté, vérifier son statut premium
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
 
-                        if (userSnap.exists()) {
-                            const userData = userSnap.data();
-                            console.log("User Data:", userData); // Vérifier ce qui est récupéré
-                            isPremium = userData.subscriptionStatus === "Premium";
-                        }
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
+
+                        // Afficher les jeux avec le bon statut premium
+                        displayGames(games, isPremium);
                     }
-                    resolve(); // Une fois le statut récupéré, on continue
-                });
+                } else {
+                    // Utilisateur non connecté : Tous les jeux sont désactivés
+                    displayGames(games, false); // Utilisateur non premium par défaut
+                }
             });
         }
 
-        async function loadGames() {
-            try {
-                const response = await fetch('games.json');
-                const games = await response.json();
-                displayGames(games);
-            } catch (error) {
-                console.error("Erreur de chargement des jeux:", error);
-            }
-        }
-
-        function displayGames(games) {
+        // Fonction pour afficher les jeux dans le conteneur
+        function displayGames(games, isPremium) {
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = ''; // Réinitialiser le conteneur
 
@@ -83,11 +83,13 @@
                 const downloadButton = document.createElement('button');
                 if (game.premium && !isPremium) {
                     downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true;
+                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
                 } else {
                     downloadButton.textContent = "Download";
-                    downloadButton.disabled = false;
-                    downloadButton.onclick = () => window.location.href = game.url;
+                    downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
+                    downloadButton.onclick = () => {
+                        window.location.href = game.url; // Lancer le téléchargement
+                    };
                 }
 
                 gameItem.appendChild(downloadButton);
@@ -95,12 +97,8 @@
             });
         }
 
-        async function init() {
-            await checkUserStatus(); // Vérifie l'utilisateur avant d'afficher les jeux
-            loadGames(); // Charge les jeux après avoir récupéré le statut premium
-        }
-
-        init(); // Lance tout le processus au chargement de la page
+        // Charger les jeux lorsque la page est prête
+        loadGames();
     </script>
 
     <script src="script.js"></script>
