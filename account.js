@@ -17,87 +17,67 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.onload = function() {
-    // Vérification de l'utilisateur connecté
+window.onload = function () {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // L'utilisateur est connecté, afficher les infos et le bouton logout
             document.getElementById("email").innerText = user.email;
 
-            // Récupérer le statut de l'abonnement de l'utilisateur depuis Firestore
+            // Récupérer le statut de l'utilisateur
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
+
             if (userSnap.exists()) {
                 const userData = userSnap.data();
-                const subscriptionStatus = userData.subscriptionStatus || "Free"; // Si l'abonnement est absent, statut par défaut "Free"
+                const subscriptionStatus = userData.subscriptionStatus || "Free";
                 document.getElementById("subscription-status").innerText = subscriptionStatus;
 
-                // Si l'utilisateur est déjà premium, cacher le bouton "Pay for Premium"
+                // Affichage du bouton selon le statut
                 if (subscriptionStatus === "Premium") {
                     document.getElementById("pay-for-premium").style.display = "none";
+                    document.getElementById("confirm-premium").style.display = "none";
                 } else {
-                    document.getElementById("pay-for-premium").style.display = "inline-block"; // Afficher le bouton Pay for Premium si l'utilisateur n'est pas premium
+                    document.getElementById("pay-for-premium").style.display = "inline-block";
+                    document.getElementById("confirm-premium").style.display = "inline-block";
                 }
-            } else {
-                console.log("Aucune donnée d'abonnement trouvée pour cet utilisateur.");
             }
-
-            document.getElementById("toggle-subscription").style.display = "none"; // Cacher le bouton "Subscribe"
-            document.getElementById("logout-btn").style.display = "inline-block"; // Afficher le bouton "Logout"
         } else {
-            // L'utilisateur n'est pas connecté, afficher le bouton de connexion
             document.getElementById("email").innerText = "Not logged in";
             document.getElementById("subscription-status").innerText = "N/A";
-            document.getElementById("toggle-subscription").style.display = "inline-block"; // Afficher le bouton "Subscribe"
-            document.getElementById("logout-btn").style.display = "none"; // Cacher le bouton "Logout"
-            document.getElementById("pay-for-premium").style.display = "none"; // Cacher le bouton Pay for Premium si l'utilisateur n'est pas connecté
+            document.getElementById("pay-for-premium").style.display = "none";
+            document.getElementById("confirm-premium").style.display = "none";
         }
     });
 
-    // Attacher l'événement de déconnexion après le chargement de la page
-    const logoutButton = document.getElementById("logout-btn");
-    logoutButton.addEventListener("click", logout);
+    // Attacher l'événement de déconnexion
+    document.getElementById("logout-btn").addEventListener("click", logout);
+    document.getElementById("pay-for-premium").addEventListener("click", payForPremium);
+    document.getElementById("confirm-premium").addEventListener("click", confirmPremium);
 };
 
-// Fonction pour gérer la déconnexion
+// Déconnexion
 function logout() {
     signOut(auth).then(() => {
-        // Rediriger vers la page d'accueil après la déconnexion
-        window.location.href = "index.html";  // Rediriger l'utilisateur après la déconnexion
+        window.location.href = "index.html";
     }).catch((error) => {
-        console.error("Erreur de déconnexion: ", error);  // Log l'erreur en cas de problème
+        console.error("Erreur de déconnexion: ", error);
     });
+}
 
+// Redirige vers Stripe
 function payForPremium() {
-    // Rediriger vers la page de paiement Stripe
     window.location.href = "https://buy.stripe.com/8wM4hnc95exIfDO288";
-};
-
 }
 
-// Fonction pour gérer l'abonnement (exemple)
-async function toggleSubscription() {
+// Confirme le Premium après le paiement
+async function confirmPremium() {
     const user = auth.currentUser;
     if (user) {
-        // Logique d'abonnement (par exemple, passer au plan Premium)
         const userRef = doc(db, "users", user.uid);
         await updateDoc(userRef, {
-            subscriptionStatus: "Premium" // Exemple, mettre à jour le statut d'abonnement
+            subscriptionStatus: "Premium"
         });
-        document.getElementById("subscription-status").innerText = "Premium"; // Mettre à jour l'affichage
-    }
-}
-
-// Fonction pour gérer l'achat du plan Premium
-async function payForPremium() {
-    const user = auth.currentUser;
-    if (user) {
-        // Logique pour passer au plan Premium
-        const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, {
-            subscriptionStatus: "Premium" // Mise à jour du statut d'abonnement
-        });
-        document.getElementById("subscription-status").innerText = "Premium"; // Mettre à jour l'affichage
-        document.getElementById("pay-for-premium").style.display = "none"; // Cacher le bouton Pay for Premium
+        document.getElementById("subscription-status").innerText = "Premium";
+        document.getElementById("pay-for-premium").style.display = "none";
+        document.getElementById("confirm-premium").style.display = "none";
     }
 }
