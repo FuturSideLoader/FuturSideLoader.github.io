@@ -11,6 +11,8 @@
         <div class="nav-container">
             <button onclick="window.location.href='login.html'" class="btn" id="login-btn">Log in</button>
             <button onclick="window.location.href='signup.html'" class="btn" id="signup-btn">Create account</button>
+            <button onclick="window.location.href='my-account.html'" class="btn" id="my-account-btn" style="display: none;">My account</button>
+            <button onclick="window.location.href='mods.html'" class="btn" id="mods-btn" style="display: none;">Mods</button>
             <span id="user-email" style="color: white;"></span> <!-- Affichage de l'email -->
         </div>
     </header>
@@ -64,6 +66,10 @@
                 // Masquer les boutons Log in et Create account
                 document.getElementById('login-btn').style.display = 'none';
                 document.getElementById('signup-btn').style.display = 'none';
+
+                // Afficher les boutons "My account" et "Mods"
+                document.getElementById('my-account-btn').style.display = 'inline-block';
+                document.getElementById('mods-btn').style.display = 'inline-block';
             } else {
                 console.log("❌ Aucun utilisateur connecté !");
                 localStorage.setItem("premium", "false");
@@ -72,6 +78,10 @@
                 // Afficher les boutons Log in et Create account
                 document.getElementById('login-btn').style.display = 'block';
                 document.getElementById('signup-btn').style.display = 'block';
+
+                // Cacher les boutons "My account" et "Mods"
+                document.getElementById('my-account-btn').style.display = 'none';
+                document.getElementById('mods-btn').style.display = 'none';
             }
         });
     </script>
