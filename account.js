@@ -34,8 +34,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Affichage du bouton en fonction du statut d'abonnement
                 if (premiumStatus) {
+                    document.getElementById("subscription-status").innerText = "Premium";
                     document.getElementById("pay-for-premium").style.display = "none"; // Masquer le bouton pay-for-premium si Premium
                 } else {
+                    document.getElementById("subscription-status").innerText = "Free";
                     document.getElementById("pay-for-premium").style.display = "inline-block"; // Afficher le bouton si Free
                 }
             }
