@@ -73,7 +73,7 @@ function logout() {
 // Redirige vers Stripe pour le paiement
 function payForPremium() {
     const successUrl = "https://futursideloader.github.io/success.html";
-    const cancelUrl = "https://futursideloader.github.io/cancel.html
+    const cancelUrl = "https://futursideloader.github.io/cancel.html";
     window.location.href = "https://buy.stripe.com/test_8wMbJP7wn0oB58YaEE";
 }
 
