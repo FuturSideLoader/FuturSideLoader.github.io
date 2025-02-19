@@ -31,7 +31,7 @@ window.onload = function () {
                 const subscriptionStatus = userData.subscriptionStatus || "Free";
                 document.getElementById("subscription-status").innerText = subscriptionStatus;
 
-                // Affichage du bouton selon le statut
+                // Affichage du bouton en fonction du statut d'abonnement
                 if (subscriptionStatus === "Premium") {
                     document.getElementById("pay-for-premium").style.display = "none";
                     document.getElementById("confirm-premium").style.display = "none";
@@ -40,11 +40,18 @@ window.onload = function () {
                     document.getElementById("confirm-premium").style.display = "inline-block";
                 }
             }
+
+            // Afficher le bouton "Logout"
+            document.getElementById("logout-btn").style.display = "inline-block";
         } else {
+            // L'utilisateur n'est pas connecté
             document.getElementById("email").innerText = "Not logged in";
             document.getElementById("subscription-status").innerText = "N/A";
             document.getElementById("pay-for-premium").style.display = "none";
             document.getElementById("confirm-premium").style.display = "none";
+
+            // Cacher le bouton "Logout"
+            document.getElementById("logout-btn").style.display = "none";
         }
     });
 
@@ -54,21 +61,21 @@ window.onload = function () {
     document.getElementById("confirm-premium").addEventListener("click", confirmPremium);
 };
 
-// Déconnexion
+// Fonction de déconnexion
 function logout() {
     signOut(auth).then(() => {
-        window.location.href = "index.html";
+        window.location.href = "index.html"; // Rediriger vers la page d'accueil après la déconnexion
     }).catch((error) => {
-        console.error("Erreur de déconnexion: ", error);
+        console.error("Erreur de déconnexion: ", error); // Log de l'erreur en cas de problème
     });
 }
 
-// Redirige vers Stripe
+// Redirige vers Stripe pour le paiement
 function payForPremium() {
     window.location.href = "https://buy.stripe.com/test_8wMbJP7wn0oB58YaEE";
 }
 
-// Confirme le Premium après le paiement
+// Confirme le statut Premium après le paiement
 async function confirmPremium() {
     const user = auth.currentUser;
     if (user) {
