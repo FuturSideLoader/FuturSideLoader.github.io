@@ -59,6 +59,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Attacher le clic pour payer pour Premium ici si nécessaire
     document.getElementById("pay-for-premium").addEventListener("click", payForPremium);
+
+    // Attacher l'événement de redirection "Home"
+    document.getElementById("home-btn").addEventListener("click", function() {
+        window.location.href = "index.html"; // Redirection vers index.html
+    });
 });
 
 // Fonction de déconnexion
