@@ -8,6 +8,9 @@ async function loadPremiumGames() {
         const games = await response.json();
         const container = document.getElementById("premium-game-container");
 
+        // Vider le conteneur avant d'ajouter les jeux pour Ã©viter les doublons
+        container.innerHTML = "";
+
         // Filtrer uniquement les jeux premium
         const premiumGames = games.filter(game => game.premium === true);
 
@@ -18,19 +21,19 @@ async function loadPremiumGames() {
             gameCard.innerHTML = `
                 <img src="${game.cover}" alt="${game.name} Cover">
                 <h2>${game.name}</h2>
-                <button onclick="downloadGame('${game.download}')">Download</button>
+                <button onclick="downloadGame('${game.url}')">Download</button>
             `;
 
             container.appendChild(gameCard);
         });
 
     } catch (error) {
-        console.error("Error with premium games list", error);
+        console.error("Error with premium games list:", error);
     }
 }
 
 function downloadGame(url) {
-    window.location.href = url; // Redirige vers le lien de téléchargement
+    window.location.href = url; // Redirige vers le lien de tÃ©lÃ©chargement
 }
 
 // Charge uniquement les jeux premium au chargement de la page
