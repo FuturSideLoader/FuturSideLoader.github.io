@@ -1,3 +1,5 @@
+let isPremiumUser = false; // Variable globale pour stocker le statut premium
+
 async function loadGames() {
     try {
         const response = await fetch("games.json");
@@ -8,8 +10,11 @@ async function loadGames() {
         const games = await response.json();
         const container = document.getElementById("game-container");
 
-        // Assurer que le statut premium est récupéré avant de continuer
-        const isPremiumUser = await getPremiumStatusFromLocalStorage();
+        // Vider le conteneur pour Ã©viter les doublons
+        container.innerHTML = "";
+
+        // RÃ©cupÃ©rer et stocker le statut premium
+        isPremiumUser = await getPremiumStatus();
 
         games.forEach(game => {
             const gameCard = document.createElement("div");
@@ -33,27 +38,23 @@ async function loadGames() {
     }
 }
 
-// Fonction pour récupérer le statut premium depuis localStorage (attente)
-async function getPremiumStatusFromLocalStorage() {
+// Fonction pour rÃ©cupÃ©rer le statut premium
+async function getPremiumStatus() {
     return new Promise(resolve => {
-        // Attends quelques millisecondes pour être sûr que Firebase a récupéré les données
-        setTimeout(() => {
-            resolve(localStorage.getItem("premium") === "true");
-        }, 500);
+        const premium = localStorage.getItem("premium") === "true";
+        resolve(premium);
     });
 }
 
 function downloadGame(url, isPremiumGame) {
-    const isPremiumUser = localStorage.getItem("premium") === "true";
-
     if (isPremiumGame && !isPremiumUser) {
         alert("You must have a paid plan to download.");
     } else {
-        window.location.href = url; // Redirige vers le lien de téléchargement
+        window.location.href = url;
     }
 }
 
-// Ajoute la fonction downloadGame à window pour qu'elle soit accessible globalement
+// Ajoute la fonction downloadGame Ã  window pour qu'elle soit accessible globalement
 window.downloadGame = downloadGame;
 
 // Charge les jeux au chargement de la page
