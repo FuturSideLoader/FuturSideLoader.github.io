@@ -41,33 +41,36 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Fonction pour afficher les jeux
         async function loadGames() {
-            try {
-                const response = await fetch('games.json');
-                const games = await response.json();
+            const response = await fetch('games.json');
+            const games = await response.json();
 
-                // Vérifier l'authentification
-                onAuthStateChanged(auth, async (user) => {
-                    let isPremium = false; // Par défaut, non premium
+            // Vérifier si l'utilisateur est connecté
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // L'utilisateur est connecté, vérifier son statut premium
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
 
-                    if (user) {
-                        const userRef = doc(db, "users", user.uid);
-                        const userSnap = await getDoc(userRef);
-                        if (userSnap.exists()) {
-                            isPremium = userSnap.data().subscriptionStatus === "Premium";
-                        }
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
+
+                        // Afficher les jeux avec le bon statut premium
+                        displayGames(games, isPremium);
                     }
-
-                    displayGames(games, isPremium);
-                });
-            } catch (error) {
-                console.error("Erreur lors du chargement des jeux :", error);
-            }
+                } else {
+                    // Utilisateur non connecté : Tous les jeux sont désactivés
+                    displayGames(games, false); // Utilisateur non premium par défaut
+                }
+            });
         }
 
+        // Fonction pour afficher les jeux dans le conteneur
         function displayGames(games, isPremium) {
             const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = ''; // Évite l'affichage en double
+            gameContainer.innerHTML = ''; // Réinitialiser le conteneur
 
             games.forEach(game => {
                 const gameItem = document.createElement('div');
@@ -80,9 +83,10 @@
                 const downloadButton = document.createElement('button');
                 if (game.premium && !isPremium) {
                     downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true; // Désactiver pour les non-premium
+                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
                 } else {
                     downloadButton.textContent = "Download";
+                    downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
                     downloadButton.onclick = () => {
                         window.location.href = game.url; // Lancer le téléchargement
                     };
@@ -93,7 +97,7 @@
             });
         }
 
-        // Lancer le chargement des jeux au démarrage
+        // Charger les jeux lorsque la page est prête
         loadGames();
     </script>
 
