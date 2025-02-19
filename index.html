@@ -41,35 +41,33 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let games = []; // Stockage des jeux pour éviter le double chargement
+        async function loadGames() {
+            try {
+                const response = await fetch('games.json');
+                const games = await response.json();
 
-        // Fonction pour charger les jeux
-        async function fetchGames() {
-            const response = await fetch('games.json');
-            games = await response.json();
-        }
+                // Vérifier l'authentification
+                onAuthStateChanged(auth, async (user) => {
+                    let isPremium = false; // Par défaut, non premium
 
-        // Fonction pour vérifier l'utilisateur et afficher les jeux
-        async function checkUserAndDisplayGames() {
-            onAuthStateChanged(auth, async (user) => {
-                let isPremium = false; // Par défaut, l'utilisateur n'est pas premium
-
-                if (user) {
-                    const userRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(userRef);
-                    if (userSnap.exists()) {
-                        isPremium = userSnap.data().subscriptionStatus === "Premium";
+                    if (user) {
+                        const userRef = doc(db, "users", user.uid);
+                        const userSnap = await getDoc(userRef);
+                        if (userSnap.exists()) {
+                            isPremium = userSnap.data().subscriptionStatus === "Premium";
+                        }
                     }
-                }
 
-                displayGames(games, isPremium);
-            });
+                    displayGames(games, isPremium);
+                });
+            } catch (error) {
+                console.error("Erreur lors du chargement des jeux :", error);
+            }
         }
 
-        // Fonction pour afficher les jeux
         function displayGames(games, isPremium) {
             const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = ''; // Réinitialiser le conteneur
+            gameContainer.innerHTML = ''; // Évite l'affichage en double
 
             games.forEach(game => {
                 const gameItem = document.createElement('div');
@@ -82,12 +80,11 @@
                 const downloadButton = document.createElement('button');
                 if (game.premium && !isPremium) {
                     downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true; // Désactiver le bouton si l'utilisateur n'est pas premium
+                    downloadButton.disabled = true; // Désactiver pour les non-premium
                 } else {
                     downloadButton.textContent = "Download";
-                    downloadButton.disabled = false;
                     downloadButton.onclick = () => {
-                        window.location.href = game.url; // Télécharger le jeu
+                        window.location.href = game.url; // Lancer le téléchargement
                     };
                 }
 
@@ -96,8 +93,8 @@
             });
         }
 
-        // Charger les jeux puis vérifier l'utilisateur
-        fetchGames().then(checkUserAndDisplayGames);
+        // Lancer le chargement des jeux au démarrage
+        loadGames();
     </script>
 
     <script src="script.js"></script>
