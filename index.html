@@ -5,26 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Download</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Ajout du style pour l'email en haut de page */
-        .email-display {
-            color: black; /* Texte noir pour l'email */
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
     <header>
         <div class="nav-container">
-            <!-- Les boutons seront mis à jour par le script -->
+            <span id="user-email" style="color: white;"></span> <!-- Affichage de l'email -->
+            <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
+            <button onclick="window.location.href='account.html'" class="btn">My account</button>
+            <button onclick="window.location.href='login.html'" class="btn">Log in</button>
+            <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
         </div>
     </header>
 
     <main>
         <h1>Welcome to FutureSideloader</h1>
-        <div class="email-display" id="user-email"> <!-- L'email de l'utilisateur s'affichera ici -->
-            <!-- L'email sera inséré dynamiquement par le script -->
-        </div>
         <div id="game-container"></div> <!-- Conteneur pour les jeux -->
     </main>
 
@@ -50,73 +44,37 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Vérifier l'état de connexion de l'utilisateur
+        // Fonction pour vérifier l'état de connexion et récupérer le statut premium
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log("✅ Utilisateur connecté :", user.email);
-
-                // Afficher l'email dans la page avec texte noir
-                document.getElementById('user-email').textContent = `👤 ${user.email}`;
-                document.getElementById('user-email').style.color = 'black'; // Changer la couleur du texte de l'email
-
-                // Récupérer les infos de l'utilisateur dans Firestore
+                // L'utilisateur est connecté, récupérer son statut premium
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
-                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
-                    
-                    // Sauvegarde du statut premium
-                    localStorage.setItem("premium", isPremium);
-                    
-                    // Mettre à jour l'interface utilisateur
-                    updateUI(user.email);
-                    // Afficher les jeux
-                    loadGames(isPremium);
+                    const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut premium
+
+                    // Mettre à jour localStorage avec le statut premium
+                    localStorage.setItem("premium", isPremium ? "true" : "false");
+
+                    // Afficher l'email de l'utilisateur
+                    document.getElementById('user-email').textContent = `👤 ${user.email}`;
+                    console.log("Utilisateur premium:", isPremium);
                 }
             } else {
-                console.log("❌ Aucun utilisateur connecté !");
+                // Si l'utilisateur n'est pas connecté, on met premium à false
                 localStorage.setItem("premium", "false");
-                updateUI(null);
-                // Afficher les jeux en mode non premium
-                loadGames(false);
             }
         });
 
-        // Mettre à jour l'interface utilisateur en fonction du statut de l'utilisateur
-        function updateUI(email) {
-            const navContainer = document.querySelector(".nav-container");
-            navContainer.innerHTML = ""; // Vider le conteneur avant d'ajouter
-
-            if (email) {
-                navContainer.innerHTML = `
-                    <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
-                    <button onclick="window.location.href='account.html'" class="btn">My Account</button>
-                    <button onclick="logout()" class="btn">Log out</button>
-                `;
-            } else {
-                navContainer.innerHTML = `
-                    <button onclick="window.location.href='login.html'" class="btn">Log in</button>
-                    <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
-                `;
-            }
-        }
-
-        // Fonction de déconnexion
-        function logout() {
-            auth.signOut().then(() => {
-                console.log("🚪 Déconnecté !");
-                window.location.reload();
-            }).catch(error => {
-                console.error("❌ Erreur de déconnexion :", error);
-            });
-        }
-
         // Fonction pour afficher les jeux
-        async function loadGames(isPremium) {
+        async function loadGames() {
             const response = await fetch('games.json');
             const games = await response.json();
+
+            // Vérifier si l'utilisateur est premium
+            const isPremium = localStorage.getItem("premium") === "true";
 
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = ''; // Réinitialiser le conteneur
@@ -132,7 +90,7 @@
                 const downloadButton = document.createElement('button');
                 if (game.premium && !isPremium) {
                     downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium si l'utilisateur n'est pas premium
+                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
                 } else {
                     downloadButton.textContent = "Download";
                     downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
@@ -146,6 +104,8 @@
             });
         }
 
+        // Charger les jeux au chargement de la page
+        loadGames();
     </script>
 
     <script src="script.js"></script>
