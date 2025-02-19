@@ -1,106 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Download</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <div class="nav-container">
-            <button onclick="window.location.href='login.html'" class="btn">Log in</button>
-            <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
-        </div>
-    </header>
+<script type="module">
+    // Importer Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    <main>
-        <h1>Welcome to FutureSideloader</h1>
-        <div id="game-container"></div> <!-- Conteneur pour les jeux -->
-    </main>
+    // Configuration Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
+        authDomain: "futursideloader.firebaseapp.com",
+        projectId: "futursideloader",
+        storageBucket: "futursideloader.firebasestorage.app",
+        messagingSenderId: "426216859785",
+        appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
+    };
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Importer Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    // Initialisation Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // Configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
-            authDomain: "futursideloader.firebaseapp.com",
-            projectId: "futursideloader",
-            storageBucket: "futursideloader.firebasestorage.app",
-            messagingSenderId: "426216859785",
-            appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
-        };
+    // Vérifier l'état de connexion de l'utilisateur
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log("✅ Utilisateur connecté :", user.email);
 
-        // Initialisation Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            // Récupérer les infos de l'utilisateur dans Firestore
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
 
-        // Fonction pour afficher les jeux
-        async function loadGames() {
-            const response = await fetch('games.json');
-            const games = await response.json();
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                const isPremium = userData.subscriptionStatus === "Premium";
+                
+                console.log("🛡️ Statut premium :", isPremium);
+                
+                // Sauvegarde le statut premium
+                localStorage.setItem("premium", isPremium);
 
-            // Vérifier si l'utilisateur est connecté
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // L'utilisateur est connecté, vérifier son statut premium
-                    const userRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(userRef);
-
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
-
-                        // Afficher les jeux avec le bon statut premium
-                        displayGames(games, isPremium);
-                    }
-                } else {
-                    // Utilisateur non connecté : Tous les jeux sont désactivés
-                    displayGames(games, false); // Utilisateur non premium par défaut
-                }
-            });
+                // Met à jour les boutons de connexion
+                updateUI(user.email);
+            } else {
+                console.log("❌ Utilisateur trouvé mais pas de données Firestore !");
+            }
+        } else {
+            console.log("❌ Aucun utilisateur connecté !");
+            localStorage.setItem("premium", "false");
+            updateUI(null);
         }
+    });
 
-        // Fonction pour afficher les jeux dans le conteneur
-        function displayGames(games, isPremium) {
-            const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = ''; // Réinitialiser le conteneur
+    // Mettre à jour l'interface utilisateur
+    function updateUI(email) {
+        const navContainer = document.querySelector(".nav-container");
+        navContainer.innerHTML = ""; // Vider le conteneur avant d'ajouter
 
-            games.forEach(game => {
-                const gameItem = document.createElement('div');
-                gameItem.classList.add('game-item');
-
-                const gameTitle = document.createElement('h2');
-                gameTitle.textContent = game.name;
-                gameItem.appendChild(gameTitle);
-
-                const downloadButton = document.createElement('button');
-                if (game.premium && !isPremium) {
-                    downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
-                } else {
-                    downloadButton.textContent = "Download";
-                    downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
-                    downloadButton.onclick = () => {
-                        window.location.href = game.url; // Lancer le téléchargement
-                    };
-                }
-
-                gameItem.appendChild(downloadButton);
-                gameContainer.appendChild(gameItem);
-            });
+        if (email) {
+            navContainer.innerHTML = `
+                <span>👤 ${email}</span>
+                <button onclick="logout()" class="btn">Log out</button>
+            `;
+        } else {
+            navContainer.innerHTML = `
+                <button onclick="window.location.href='login.html'" class="btn">Log in</button>
+                <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
+            `;
         }
+    }
 
-        // Charger les jeux lorsque la page est prête
-        loadGames();
-    </script>
+    // Fonction de déconnexion
+    function logout() {
+        auth.signOut().then(() => {
+            console.log("🚪 Déconnecté !");
+            window.location.reload();
+        }).catch(error => {
+            console.error("❌ Erreur de déconnexion :", error);
+        });
+    }
 
-    <script src="script.js"></script>
-</body>
-</html>
+    // Ajoute la fonction logout à window pour qu'elle soit accessible globalement
+    window.logout = logout;
+</script>
