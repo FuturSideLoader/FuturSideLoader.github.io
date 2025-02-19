@@ -29,11 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (userSnap.exists()) {
                 const userData = userSnap.data();
-                const subscriptionStatus = userData.subscriptionStatus || "Free";
-                document.getElementById("subscription-status").innerText = subscriptionStatus;
+                const premiumStatus = userData.premium || false;
+                
 
                 // Affichage du bouton en fonction du statut d'abonnement
-                if (subscriptionStatus === "Premium") {
+                if (premiumStatus) {
                     document.getElementById("pay-for-premium").style.display = "none"; // Masquer le bouton pay-for-premium si Premium
                 } else {
                     document.getElementById("pay-for-premium").style.display = "inline-block"; // Afficher le bouton si Free
