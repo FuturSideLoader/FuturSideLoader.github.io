@@ -91,3 +91,24 @@ main {
 .premium-link:hover {
     background-color: #e0a800;
 }
+
+/* Styles for download buttons in mods.html */
+.mod-item .btn {
+    background-color: #007bff; /* Same style as nav buttons */
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.mod-item .btn:hover {
+    background-color: #0056b3;
+}
+
+.mod-item .btn:disabled {
+    background-color: #d3d3d3;
+    cursor: not-allowed;
+}
