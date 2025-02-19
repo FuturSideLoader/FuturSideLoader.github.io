@@ -8,7 +8,7 @@
 </head>
 <body>
     <header>
-        <div class="nav-container">
+        <div class="nav-container" id="nav-container">
             <button onclick="window.location.href='login.html'" class="btn">Log in</button>
             <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
         </div>
@@ -23,7 +23,7 @@
     <script type="module">
         // Importer Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         // Configuration Firebase
@@ -37,70 +37,4 @@
         };
 
         // Initialisation Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Fonction pour afficher les jeux
-        async function loadGames() {
-            const response = await fetch('games.json');
-            const games = await response.json();
-
-            // Vérifier si l'utilisateur est connecté
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // L'utilisateur est connecté, vérifier son statut premium
-                    const userRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(userRef);
-
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
-
-                        // Afficher les jeux avec le bon statut premium
-                        displayGames(games, isPremium);
-                    }
-                } else {
-                    // Utilisateur non connecté : Tous les jeux sont désactivés
-                    displayGames(games, false); // Utilisateur non premium par défaut
-                }
-            });
-        }
-
-        // Fonction pour afficher les jeux dans le conteneur
-        function displayGames(games, isPremium) {
-            const gameContainer = document.getElementById('game-container');
-            gameContainer.innerHTML = ''; // Réinitialiser le conteneur
-
-            games.forEach(game => {
-                const gameItem = document.createElement('div');
-                gameItem.classList.add('game-item');
-
-                const gameTitle = document.createElement('h2');
-                gameTitle.textContent = game.name;
-                gameItem.appendChild(gameTitle);
-
-                const downloadButton = document.createElement('button');
-                if (game.premium && !isPremium) {
-                    downloadButton.textContent = "Upgrade to a paid plan to download";
-                    downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
-                } else {
-                    downloadButton.textContent = "Download";
-                    downloadButton.disabled = false; // Activer le bouton pour les jeux non-premium ou si l'utilisateur est premium
-                    downloadButton.onclick = () => {
-                        window.location.href = game.url; // Lancer le téléchargement
-                    };
-                }
-
-                gameItem.appendChild(downloadButton);
-                gameContainer.appendChild(gameItem);
-            });
-        }
-
-        // Charger les jeux lorsque la page est prête
-        loadGames();
-    </script>
-
-    <script src="script.js"></script>
-</body>
-</html>
+        con
