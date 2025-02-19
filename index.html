@@ -9,20 +9,16 @@
 <body>
     <header>
         <div class="nav-container">
+            <span id="user-email"></span>
             <button onclick="window.location.href='login.html'" class="btn">Log in</button>
             <button onclick="window.location.href='signup.html'" class="btn">Create account</button>
-            <!-- Ajouter les nouveaux boutons -->
             <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
-            <button onclick="window.location.href='account.html'" class="btn">My Account</button>
+            <button onclick="window.location.href='account.html'" class="btn">My account</button>
         </div>
     </header>
 
     <main>
         <h1>Welcome to FutureSideloader</h1>
-
-        <!-- Affichage de l'email de l'utilisateur connecté -->
-        <div id="user-email"></div>
-
         <div id="game-container"></div> <!-- Conteneur pour les jeux -->
     </main>
 
@@ -48,38 +44,47 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        let isPremiumUser = false; // Variable globale pour le statut premium
+
+        // Vérifier l'état de connexion de l'utilisateur
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("✅ Utilisateur connecté :", user.email);
+
+                // Récupérer les infos de l'utilisateur dans Firestore
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    isPremiumUser = userData.subscriptionStatus === "Premium"; // Vérifier le statut premium
+
+                    // Afficher l'email de l'utilisateur
+                    document.getElementById('user-email').textContent = `👤 ${user.email}`;
+                    document.getElementById('user-email').style.color = 'black'; // Changer la couleur de l'email
+
+                    // Sauvegarder le statut premium dans localStorage
+                    localStorage.setItem("premium", isPremiumUser ? "true" : "false");
+
+                    // Charger les jeux
+                    loadGames();
+                } else {
+                    console.log("❌ Utilisateur trouvé mais pas de données Firestore !");
+                }
+            } else {
+                console.log("❌ Aucun utilisateur connecté !");
+                localStorage.setItem("premium", "false");
+                document.getElementById('user-email').textContent = "👤 Not logged in";
+                document.getElementById('user-email').style.color = 'black';
+                loadGames();
+            }
+        });
+
         // Fonction pour afficher les jeux
-        async function loadGames(isPremium) {
+        async function loadGames() {
             const response = await fetch('games.json');
             const games = await response.json();
 
-            // Vérifier si l'utilisateur est connecté
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // L'utilisateur est connecté, récupérer son email et afficher les jeux premium ou non
-                    document.getElementById('user-email').textContent = `👤 ${user.email}`;
-                    document.getElementById('user-email').style.color = "black"; // Couleur de l'email en noir
-
-                    // Vérifier le statut premium de l'utilisateur dans Firestore
-                    const userRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(userRef);
-
-                    if (userSnap.exists()) {
-                        const userData = userSnap.data();
-                        const isPremiumUser = userData.subscriptionStatus === "Premium"; // Vérifier le statut Premium
-
-                        // Afficher les jeux en fonction du statut premium
-                        displayGames(games, isPremiumUser);
-                    }
-                } else {
-                    // Utilisateur non connecté, ne pas afficher de jeux premium
-                    displayGames(games, false);
-                }
-            });
-        }
-
-        // Fonction pour afficher les jeux dans le conteneur
-        function displayGames(games, isPremium) {
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = ''; // Réinitialiser le conteneur
 
@@ -92,7 +97,7 @@
                 gameItem.appendChild(gameTitle);
 
                 const downloadButton = document.createElement('button');
-                if (game.premium && !isPremium) {
+                if (game.premium && !isPremiumUser) {
                     downloadButton.textContent = "Upgrade to a paid plan to download";
                     downloadButton.disabled = true; // Désactiver le bouton pour les jeux premium
                 } else {
@@ -107,11 +112,6 @@
                 gameContainer.appendChild(gameItem);
             });
         }
-
-        // Charger les jeux lorsque la page est prête
-        loadGames();
     </script>
-
-    <script src="script.js"></script>
 </body>
 </html>
