@@ -33,12 +33,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("subscription-status").innerText = subscriptionStatus;
 
                 // Affichage du bouton en fonction du statut d'abonnement
-                if (subscriptionStatus === "Premium") {
-                    document.getElementById("pay-for-premium").style.display = "none";
-                    document.getElementById("confirm-premium").style.display = "none";
+                const payForPremiumBtn = document.getElementById("pay-for-premium");
+                const confirmPremiumBtn = document.getElementById("confirm-premium");
+
+                if (payForPremiumBtn && confirmPremiumBtn) {
+                    if (subscriptionStatus === "Premium") {
+                        payForPremiumBtn.style.display = "none";
+                        confirmPremiumBtn.style.display = "none";
+                    } else {
+                        payForPremiumBtn.style.display = "inline-block";
+                        confirmPremiumBtn.style.display = "inline-block";
+                    }
                 } else {
-                    document.getElementById("pay-for-premium").style.display = "inline-block";
-                    document.getElementById("confirm-premium").style.display = "inline-block";
+                    console.log("Les boutons 'pay-for-premium' ou 'confirm-premium' sont manquants dans le DOM");
                 }
             }
 
@@ -54,8 +61,15 @@ document.addEventListener("DOMContentLoaded", function () {
             // L'utilisateur n'est pas connecté
             document.getElementById("email").innerText = "Not logged in";
             document.getElementById("subscription-status").innerText = "N/A";
-            document.getElementById("pay-for-premium").style.display = "none";
-            document.getElementById("confirm-premium").style.display = "none";
+
+            const payForPremiumBtn = document.getElementById("pay-for-premium");
+            const confirmPremiumBtn = document.getElementById("confirm-premium");
+
+            // S'assurer que les boutons existent avant de les manipuler
+            if (payForPremiumBtn && confirmPremiumBtn) {
+                payForPremiumBtn.style.display = "none";
+                confirmPremiumBtn.style.display = "none";
+            }
 
             // Cacher le bouton "Logout"
             const logoutButton = document.getElementById("logout-btn");
@@ -66,7 +80,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Attacher le clic pour payer pour Premium ici si nécessaire
-    document.getElementById("pay-for-premium").addEventListener("click", payForPremium);
+    const payForPremiumBtn = document.getElementById("pay-for-premium");
+    if (payForPremiumBtn) {
+        payForPremiumBtn.addEventListener("click", payForPremium);
+    }
+
+    const confirmPremiumBtn = document.getElementById("confirm-premium");
+    if (confirmPremiumBtn) {
+        confirmPremiumBtn.addEventListener("click", confirmPremium);
+    }
 });
 
 // Fonction de déconnexion
@@ -83,4 +105,10 @@ function payForPremium() {
     const successUrl = "https://futursideloader.github.io/success.html";
     const cancelUrl = "https://futursideloader.github.io/cancel.html";
     window.location.href = "https://buy.stripe.com/test_8wMbJP7wn0oB58YaEE";
+}
+
+// Fonction pour confirmer l'abonnement Premium (si nécessaire)
+function confirmPremium() {
+    // Actions à réaliser pour confirmer le statut Premium
+    console.log("Abonnement Premium confirmé");
 }
