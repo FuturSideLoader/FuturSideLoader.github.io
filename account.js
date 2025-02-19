@@ -42,10 +42,11 @@ window.onload = function () {
             }
 
             // Afficher le bouton "Logout"
-            document.getElementById("logout-btn").style.display = "inline-block";
-
-            // Attacher l'événement de déconnexion ici, après que l'utilisateur soit connecté
-            document.getElementById("logout-btn").addEventListener("click", logout);
+            const logoutButton = document.getElementById("logout-btn");
+            if (logoutButton) {
+                logoutButton.style.display = "inline-block"; // S'assurer qu'il est visible
+                logoutButton.addEventListener("click", logout); // Ajouter l'événement de déconnexion
+            }
         } else {
             // L'utilisateur n'est pas connecté
             document.getElementById("email").innerText = "Not logged in";
@@ -54,7 +55,10 @@ window.onload = function () {
             document.getElementById("confirm-premium").style.display = "none";
 
             // Cacher le bouton "Logout"
-            document.getElementById("logout-btn").style.display = "none";
+            const logoutButton = document.getElementById("logout-btn");
+            if (logoutButton) {
+                logoutButton.style.display = "none"; // Cacher le bouton logout si l'utilisateur est déconnecté
+            }
         }
     });
 
