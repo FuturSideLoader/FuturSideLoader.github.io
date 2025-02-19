@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Download</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Ajout du style pour l'email en haut de page */
+        .email-display {
+            color: white; /* Texte blanc pour être visible sur fond sombre */
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -15,6 +22,9 @@
 
     <main>
         <h1>Welcome to FutureSideloader</h1>
+        <div class="email-display" id="user-email"> <!-- L'email de l'utilisateur s'affichera ici -->
+            <!-- L'email sera inséré dynamiquement par le script -->
+        </div>
         <div id="game-container"></div> <!-- Conteneur pour les jeux -->
     </main>
 
@@ -44,6 +54,9 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 console.log("✅ Utilisateur connecté :", user.email);
+
+                // Afficher l'email dans la page
+                document.getElementById('user-email').textContent = `👤 ${user.email}`;
 
                 // Récupérer les infos de l'utilisateur dans Firestore
                 const userRef = doc(db, "users", user.uid);
@@ -78,6 +91,8 @@
             if (email) {
                 navContainer.innerHTML = `
                     <span>👤 ${email}</span>
+                    <button onclick="window.location.href='mods.html'" class="btn">Mods</button>
+                    <button onclick="window.location.href='account.html'" class="btn">My Account</button>
                     <button onclick="logout()" class="btn">Log out</button>
                 `;
             } else {
