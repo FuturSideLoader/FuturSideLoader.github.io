@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (logoutButton) {
                 logoutButton.style.display = "inline-block"; // S'assurer qu'il est visible
                 logoutButton.addEventListener("click", logout); // Ajouter l'événement de déconnexion
+            } else {
+                console.log("Le bouton Logout n'existe pas dans le DOM");
             }
         } else {
             // L'utilisateur n'est pas connecté
