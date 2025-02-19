@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 
 // Configuration Firebase
@@ -29,23 +29,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (userSnap.exists()) {
                 const userData = userSnap.data();
-                const premiumStatus = userData.premium || false;
-                
+                const premiumStatus = userData.subscriptionStatus || "Free"; // Remplacer par 'subscriptionStatus' dans Firestore
 
-                // Affichage du bouton en fonction du statut d'abonnement
-                if (premiumStatus) {
-                    document.getElementById("subscription-status").innerText = "Premium";
-                    document.getElementById("pay-for-premium").style.display = "none"; // Masquer le bouton pay-for-premium si Premium
+                // Affichage du statut d'abonnement
+                document.getElementById("subscription-status").innerText = premiumStatus;
+
+                // Afficher/Masquer les boutons en fonction du statut
+                if (premiumStatus === "Premium") {
+                    document.getElementById("pay-for-premium").style.display = "none"; // Masquer si Premium
                 } else {
-                    document.getElementById("subscription-status").innerText = "Free";
-                    document.getElementById("pay-for-premium").style.display = "inline-block"; // Afficher le bouton si Free
+                    document.getElementById("pay-for-premium").style.display = "inline-block"; // Afficher si Free
                 }
             }
 
-            // Vérifier si le bouton "Logout" existe avant de manipuler son style
+            // Afficher le bouton logout
             const logoutButton = document.getElementById("logout-btn");
             if (logoutButton) {
-                logoutButton.style.display = "inline-block"; // S'assurer qu'il est visible
+                logoutButton.style.display = "inline-block"; // Afficher le bouton logout
                 logoutButton.addEventListener("click", logout); // Ajouter l'événement de déconnexion
             }
         } else {
@@ -53,8 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("email").innerText = "Not logged in";
             document.getElementById("subscription-status").innerText = "N/A";
             document.getElementById("pay-for-premium").style.display = "none"; // Masquer si pas connecté
-            document.getElementById("logout-btn").style.display = "none"; // Cacher le bouton logout
-
+            document.getElementById("logout-btn").style.display = "none"; // Masquer le bouton logout
         }
     });
 
