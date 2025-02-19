@@ -1,4 +1,3 @@
-<!-- Forcing GitHub Pages update -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +19,13 @@
 
     <main>
         <h1>Welcome to FutureSideloader</h1>
-        <div id="game-container"></div>
+        <div id="game-container">
+            <!-- Exemple de jeu avec téléchargement premium -->
+            <div class="game-item">
+                <h2>Premium Game 1</h2>
+                <button class="download-btn" id="download-btn-1">Upgrade to a paid plan to download</button>
+            </div>
+        </div>
     </main>
 
     <!-- Firebase SDKs (Version modulaire) -->
@@ -64,21 +69,25 @@
                     const userData = userSnap.data();
                     const isPremium = userData.subscriptionStatus === "Premium"; // Vérifier si premium
 
-                    console.log("User is premium: " + isPremium); // Vérification
-
                     // Si l'utilisateur est premium, cacher le bouton "Pay for Premium"
                     if (isPremium) {
                         premiumButton.style.display = "none";
+
+                        // Modifier les boutons de téléchargement des jeux premium
+                        document.querySelectorAll('.download-btn').forEach((button) => {
+                            button.textContent = "Download";
+                            button.disabled = false; // Activer le bouton de téléchargement
+                        });
                     } else {
                         premiumButton.style.display = "inline-block";
-                    }
-                } else {
-                    console.log("User document not found!");
-                    premiumButton.style.display = "inline-block"; // Si aucune donnée, afficher le bouton
-                }
 
-                // Afficher le bouton My Account
-                myAccountButton.style.display = "inline-block";
+                        // Modifier les boutons de téléchargement pour les utilisateurs non premium
+                        document.querySelectorAll('.download-btn').forEach((button) => {
+                            button.textContent = "Upgrade to a paid plan to download";
+                            button.disabled = true; // Désactiver le bouton de téléchargement
+                        });
+                    }
+                }
             } else {
                 // Si l'utilisateur n'est pas connecté, afficher les boutons Log in et Create account
                 loginButton.style.display = "inline-block";
@@ -87,6 +96,12 @@
                 // Masquer les boutons My Account et Premium
                 myAccountButton.style.display = "none";
                 premiumButton.style.display = "none";
+
+                // Désactiver les boutons de téléchargement
+                document.querySelectorAll('.download-btn').forEach((button) => {
+                    button.textContent = "Upgrade to a paid plan to download";
+                    button.disabled = true;
+                });
             }
         });
     </script>
