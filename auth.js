@@ -27,12 +27,12 @@ function signUp(email, password) {
             // Ajouter l'utilisateur dans Firestore
             return setDoc(doc(firestore, "users", user.uid), {
                 email: user.email,
-                premium: false // L'utilisateur est non premium par défaut
+                subscriptionStatus: "Free" // L'utilisateur est non premium par dÃ©faut
             });
         })
         .then(() => {
-            alert("Compte créé avec succès !");
-            window.location.href = "index.html"; // Redirection après inscription
+            alert("Compte crÃ©Ã© avec succÃ¨s !");
+            window.location.href = "index.html"; // Redirection aprÃ¨s inscription
         })
         .catch(error => {
             console.error("Erreur d'inscription:", error.message);
@@ -44,7 +44,7 @@ function signUp(email, password) {
 function login(email, password) {
     signInWithEmailAndPassword(auth, email, password)
         .then(userCredential => {
-            window.location.href = "index.html"; // Redirection après connexion
+            window.location.href = "index.html"; // Redirection aprÃ¨s connexion
         })
         .catch(error => {
             console.error("Erreur de connexion:", error.message);
@@ -52,35 +52,35 @@ function login(email, password) {
         });
 }
 
-// Vérification du statut de l'utilisateur (premium ou non)
+// VÃ©rification du statut de l'utilisateur (premium ou non)
 onAuthStateChanged(auth, user => {
-    console.log("Utilisateur connecté ?", user); // Debug: Vérifie l'état de l'utilisateur
+    console.log("Utilisateur connectÃ© ?", user); // Debug: VÃ©rifie l'Ã©tat de l'utilisateur
     if (user) {
-        console.log("L'utilisateur est connecté");
-        enableDownloadButtons(true); // Activer les boutons de téléchargement
+        console.log("L'utilisateur est connectÃ©");
+        enableDownloadButtons(true); // Activer les boutons de tÃ©lÃ©chargement
     } else {
-        console.log("Aucun utilisateur connecté");
-        enableDownloadButtons(false); // Désactiver les boutons de téléchargement
+        console.log("Aucun utilisateur connectÃ©");
+        enableDownloadButtons(false); // DÃ©sactiver les boutons de tÃ©lÃ©chargement
     }
 });
 
-// Fonction pour activer ou désactiver les boutons de téléchargement
+// Fonction pour activer ou dÃ©sactiver les boutons de tÃ©lÃ©chargement
 function enableDownloadButtons(isLoggedIn) {
     const downloadButtons = document.querySelectorAll('.download-btn');
-    console.log("isLoggedIn: ", isLoggedIn); // Debug : Vérifie l'état de la connexion
+    console.log("isLoggedIn: ", isLoggedIn); // Debug : VÃ©rifie l'Ã©tat de la connexion
 
     downloadButtons.forEach(button => {
         if (isLoggedIn) {
-            button.disabled = false; // Activer le bouton de téléchargement si l'utilisateur est connecté
+            button.disabled = false; // Activer le bouton de tÃ©lÃ©chargement si l'utilisateur est connectÃ©
             button.style.cursor = "pointer"; // Curseur de souris normal
         } else {
-            button.disabled = true; // Désactiver le bouton si l'utilisateur n'est pas connecté
-            button.style.cursor = "not-allowed"; // Curseur de souris pour indiquer désactivation
+            button.disabled = true; // DÃ©sactiver le bouton si l'utilisateur n'est pas connectÃ©
+            button.style.cursor = "not-allowed"; // Curseur de souris pour indiquer dÃ©sactivation
         }
     });
 }
 
-// Fonction pour vérifier si l'utilisateur est connecté avant un téléchargement
+// Fonction pour vÃ©rifier si l'utilisateur est connectÃ© avant un tÃ©lÃ©chargement
 function checkLoginBeforeDownload(event) {
     const user = auth.currentUser;
 
@@ -90,25 +90,25 @@ function checkLoginBeforeDownload(event) {
     } else {
         const downloadButton = event.target;
         downloadButton.textContent = "Downloading..."; // Afficher "Downloading..."
-        downloadButton.disabled = true; // Désactiver le bouton
+        downloadButton.disabled = true; // DÃ©sactiver le bouton
 
-        // Lancer la fonction de téléchargement
+        // Lancer la fonction de tÃ©lÃ©chargement
         downloadGame();
 
-        // Réactiver le bouton après un délai
+        // RÃ©activer le bouton aprÃ¨s un dÃ©lai
         setTimeout(() => {
-            downloadButton.textContent = "Download"; // Réinitialiser le texte du bouton
-            downloadButton.disabled = false; // Réactiver le bouton
-        }, 3000); // Délai de 3 secondes pour l'exemple
+            downloadButton.textContent = "Download"; // RÃ©initialiser le texte du bouton
+            downloadButton.disabled = false; // RÃ©activer le bouton
+        }, 3000); // DÃ©lai de 3 secondes pour l'exemple
     }
 }
 
-// Fonction de téléchargement (exemple de téléchargement)
+// Fonction de tÃ©lÃ©chargement (exemple de tÃ©lÃ©chargement)
 function downloadGame() {
     console.log("Game downloaded!");
 }
 
-// Ajouter un gestionnaire d'événements pour les boutons de téléchargement
+// Ajouter un gestionnaire d'Ã©vÃ©nements pour les boutons de tÃ©lÃ©chargement
 document.querySelectorAll('.download-btn').forEach(button => {
     button.addEventListener('click', checkLoginBeforeDownload);
 });
