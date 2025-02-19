@@ -1,14 +1,7 @@
 let isPremiumUser = false; // Variable globale pour stocker le statut premium
 
-// Fonction principale pour charger les jeux
 async function loadGames() {
     try {
-        // Affichage du statut premium actuel
-        console.log("Vérification du statut premium avant de charger les jeux");
-        isPremiumUser = await getPremiumStatus();
-        console.log("Statut premium: ", isPremiumUser);
-
-        // Charger les jeux uniquement après avoir récupéré le statut premium
         const response = await fetch("games.json");
         if (!response.ok) {
             throw new Error("Erreur avec le fichier JSON");
@@ -20,15 +13,14 @@ async function loadGames() {
         // Vider le conteneur pour éviter les doublons
         container.innerHTML = "";
 
-        // Générer la carte de chaque jeu
+        // Récupérer et stocker le statut premium
+        isPremiumUser = await getPremiumStatus();
+
         games.forEach(game => {
             const gameCard = document.createElement("div");
             gameCard.classList.add("game-card");
 
-            // Vérifier le statut premium et afficher le bon texte pour le bouton
             const buttonText = game.premium && !isPremiumUser ? "Upgrade to a paid plan to download" : "Download";
-
-            console.log(`Jeu: ${game.name}, Premium: ${game.premium}, Statut utilisateur premium: ${isPremiumUser}`);
 
             gameCard.innerHTML = `
                 <img src="${game.cover}" alt="${game.name} Cover">
@@ -46,19 +38,15 @@ async function loadGames() {
     }
 }
 
-// Fonction pour récupérer le statut premium depuis le localStorage
+// Fonction pour récupérer le statut premium
 async function getPremiumStatus() {
-    console.log("Récupération du statut premium depuis localStorage");
     return new Promise(resolve => {
-        const premium = localStorage.getItem("premium") === "true"; // Vérifier si l'utilisateur est premium
-        console.log("Statut premium récupéré: ", premium);
+        const premium = localStorage.getItem("premium") === "true";
         resolve(premium);
     });
 }
 
-// Fonction pour télécharger un jeu
 function downloadGame(url, isPremiumGame) {
-    console.log(`Essayer de télécharger le jeu: ${url}, Premium: ${isPremiumGame}, Statut utilisateur premium: ${isPremiumUser}`);
     if (isPremiumGame && !isPremiumUser) {
         alert("You must have a paid plan to download.");
     } else {
