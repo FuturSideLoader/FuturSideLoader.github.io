@@ -43,6 +43,9 @@ window.onload = function () {
 
             // Afficher le bouton "Logout"
             document.getElementById("logout-btn").style.display = "inline-block";
+
+            // Attacher l'événement de déconnexion ici, après que l'utilisateur soit connecté
+            document.getElementById("logout-btn").addEventListener("click", logout);
         } else {
             // L'utilisateur n'est pas connecté
             document.getElementById("email").innerText = "Not logged in";
@@ -55,8 +58,7 @@ window.onload = function () {
         }
     });
 
-    // Attacher l'événement de déconnexion
-    document.getElementById("logout-btn").addEventListener("click", logout);
+    // Attacher le clic pour payer pour Premium ici si nécessaire
     document.getElementById("pay-for-premium").addEventListener("click", payForPremium);
 };
 
@@ -77,4 +79,3 @@ function payForPremium() {
 }
 
 // Confirme le statut Premium après le paiement
-
