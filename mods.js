@@ -1,15 +1,15 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // 🔥 Config Firebase (remplace par la tienne)
 const firebaseConfig = {
-  apiKey: "TA_CLE_API",
-  authDomain: "TON_PROJET.firebaseapp.com",
-  projectId: "TON_PROJET",
-  storageBucket: "TON_PROJET.appspot.com",
-  messagingSenderId: "ID",
-  appId: "ID"
+  apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
+  authDomain: "futursideloader.firebaseapp.com",
+  projectId: "futursideloader",
+  storageBucket: "futursideloader.firebasestorage.app",
+  messagingSenderId: "426216859785",
+  appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
 };
 
 // 🔥 Initialisation Firebase
