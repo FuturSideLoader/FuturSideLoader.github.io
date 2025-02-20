@@ -86,7 +86,7 @@
 
         async function loadGames() {
             try {
-                // Récupérer les jeux depuis Firestore
+                // Récupérer les jeux depuis Firestore en utilisant la syntaxe modulaire
                 const gamesRef = collection(db, "games");
                 const snapshot = await getDocs(gamesRef);
                 const games = snapshot.docs.map(doc => doc.data());
