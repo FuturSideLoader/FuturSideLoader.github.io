@@ -23,12 +23,11 @@
     </main>
 
     <!-- Firebase SDK -->
-    <script type="module">
-        // Importer Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
+    <script>
         // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
@@ -40,12 +39,12 @@
         };
 
         // Initialisation Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         // Vérifier l'état de connexion de l'utilisateur
-        onAuthStateChanged(auth, async (user) => {
+        firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 console.log("✅ Utilisateur connecté :", user.email);
 
@@ -53,10 +52,10 @@
                 document.getElementById('user-email').textContent = `👤 ${user.email}`;
 
                 // Récupérer les infos de l'utilisateur dans Firestore
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
+                const userRef = db.collection("users").doc(user.uid);
+                const userSnap = await userRef.get();
 
-                if (userSnap.exists()) {
+                if (userSnap.exists) {
                     const userData = userSnap.data();
                     const isPremium = userData.subscriptionStatus === "Premium";
                     console.log("🛡️ Statut premium :", isPremium);
@@ -84,20 +83,67 @@
                 document.getElementById('mods-btn').style.display = 'none';
             }
         });
+
+        async function loadGames() {
+            try {
+                // Récupérer les jeux depuis Firestore
+                const gamesRef = db.collection("games");
+                const snapshot = await gamesRef.get();
+                const games = snapshot.docs.map(doc => doc.data());
+                const container = document.getElementById("game-container");
+
+                // Vider le conteneur pour éviter les doublons
+                container.innerHTML = "";
+
+                // Récupérer et stocker le statut premium
+                const isPremiumUser = localStorage.getItem("premium") === "true";
+
+                games.forEach(game => {
+                    const gameCard = document.createElement("div");
+                    gameCard.classList.add("game-card");
+
+                    const buttonText = game.premium && !isPremiumUser ? "Upgrade to a paid plan to download" : "Download";
+
+                    gameCard.innerHTML = `
+                        <img src="${game.cover}" alt="${game.name} Cover">
+                        <h2>${game.name}</h2>
+                        <button onclick="downloadGame('${game.download}', ${game.premium})">
+                            ${isPremiumUser && game.premium ? "Download" : buttonText}
+                        </button>
+                    `;
+
+                    container.appendChild(gameCard);
+                });
+
+            } catch (error) {
+                console.error("Erreur lors du chargement des jeux", error);
+            }
+        }
+
+        function downloadGame(url, isPremiumGame) {
+            const isPremiumUser = localStorage.getItem("premium") === "true";
+            if (isPremiumGame && !isPremiumUser) {
+                alert("You must have a paid plan to download.");
+            } else {
+                window.location.href = url;
+            }
+        }
+
+        window.onload = loadGames;
     </script>
 
     <script src="script.js"></script>
 
     <footer>
-    <div class="footer-left">
-        <a href="legal.html" class="footer-link">Legal Notice</a>
-        <a href="cgu.html" class="footer-link">Terms and Conditions of Sale</a>
-        <a href="cgu.html" class="footer-link">Terms of Use</a>
-    </div>
-    <div class="footer-center">
-        <p>&copy; 2025 FutureSideLoader</p>
-    </div>
-</footer>
+        <div class="footer-left">
+            <a href="legal.html" class="footer-link">Legal Notice</a>
+            <a href="cgu.html" class="footer-link">Terms and Conditions of Sale</a>
+            <a href="cgu.html" class="footer-link">Terms of Use</a>
+        </div>
+        <div class="footer-center">
+            <p>&copy; 2025 FutureSideLoader</p>
+        </div>
+    </footer>
     
 </body>
 </html>
