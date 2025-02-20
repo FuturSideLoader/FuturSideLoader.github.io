@@ -47,7 +47,7 @@ function downloadGame(url, isPremiumGame) {
     if (isPremiumGame && !isPremiumUser) {
         alert("You must have a paid plan to download.");
     } else {
-        window.location.href = url;
+        window.open(url, '_blank');
     }
 }
 
