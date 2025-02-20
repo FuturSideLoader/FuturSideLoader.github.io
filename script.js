@@ -1,22 +1,20 @@
 let isPremiumUser = false; // Variable globale pour stocker le statut premium
 
+// Initialise Firebase (assure-toi que Firebase est bien importé dans index.html)
+const db = firebase.firestore();
+
 async function loadGames() {
     try {
-        const response = await fetch("games.json");
-        if (!response.ok) {
-            throw new Error("Erreur avec le fichier JSON");
-        }
-
-        const games = await response.json();
         const container = document.getElementById("game-container");
+        container.innerHTML = ""; // Vide le conteneur avant d'ajouter les jeux
 
-        // Vider le conteneur pour éviter les doublons
-        container.innerHTML = "";
+        isPremiumUser = await getPremiumStatus(); // Vérifie si l'utilisateur est premium
 
-        // Récupérer et stocker le statut premium
-        isPremiumUser = await getPremiumStatus();
+        // Récupérer les jeux depuis Firestore
+        const querySnapshot = await db.collection("games").get();
 
-        games.forEach(game => {
+        querySnapshot.forEach(doc => {
+            const game = doc.data();
             const gameCard = document.createElement("div");
             gameCard.classList.add("game-card");
 
@@ -34,7 +32,7 @@ async function loadGames() {
         });
 
     } catch (error) {
-        console.error("Erreur lors du chargement des jeux", error);
+        console.error("Erreur lors du chargement des jeux depuis Firestore", error);
     }
 }
 
@@ -57,5 +55,5 @@ function downloadGame(url, isPremiumGame) {
 // Ajoute la fonction downloadGame à window pour qu'elle soit accessible globalement
 window.downloadGame = downloadGame;
 
-// Charge les jeux au chargement de la page
+// Charge les jeux depuis Firestore au chargement de la page
 window.onload = loadGames;
