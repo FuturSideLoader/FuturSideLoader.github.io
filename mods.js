@@ -1,111 +1,48 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
-// Initialisation Firebase
+// 🔥 Config Firebase (remplace par la tienne)
 const firebaseConfig = {
-    apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
-    authDomain: "futursideloader.firebaseapp.com",
-    projectId: "futursideloader",
-    storageBucket: "futursideloader.firebasestorage.app",
-    messagingSenderId: "426216859785",
-    appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58",
-    measurementId: "G-WT4H922PQW"
+  apiKey: "TA_CLE_API",
+  authDomain: "TON_PROJET.firebaseapp.com",
+  projectId: "TON_PROJET",
+  storageBucket: "TON_PROJET.appspot.com",
+  messagingSenderId: "ID",
+  appId: "ID"
 };
 
+// 🔥 Initialisation Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-// Vérification de Firestore
-if (!db) {
-    console.error("Firestore n'a pas pu être initialisé !");
-} else {
-    console.log("Firestore initialisé avec succès !");
-}
-
-// Vérifier l'état de l'utilisateur
-onAuthStateChanged(auth, async (user) => {
-    console.log("Checking authentication status...");
-
-    if (!user) {
-        console.log("User not logged in. Redirecting...");
-        alert("You must be logged in to access mods.");
-        window.location.href = "index.html";
-        return;
-    }
-
-    console.log("User logged in:", user.email);
-
-    try {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-            console.log("User document not found in Firestore.");
-            alert("User document not found.");
-            window.location.href = "index.html";
-            return;
-        }
-
-        console.log("? User is logged in. Loading mods...");
-        loadMods(userSnap.data().premium);
-
-    } catch (error) {
-        console.error("? Error checking user status:", error);
-        alert("An error occurred. Please try again later.");
-        window.location.href = "index.html";
-    }
+// 🔥 Vérifier l’authentification
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadMods();
+  } else {
+    document.getElementById("mods-container").innerHTML = "<p>You must be logged in to see the mods.</p>";
+  }
 });
 
-// Charger les mods depuis le fichier JSON
-async function loadMods(isPremiumUser) {
-    console.log("Starting loadMods()...");
+// 📥 Charger les mods depuis Firestore
+async function loadMods() {
+  const modsContainer = document.getElementById("mods-container");
+  modsContainer.innerHTML = ""; // Vide le container
 
-    try {
-        console.log("Fetching mods.json...");
-        const response = await fetch("mods.json");
+  const querySnapshot = await getDocs(collection(db, "mods"));
+  querySnapshot.forEach((doc) => {
+    const mod = doc.data();
+    const modElement = document.createElement("div");
+    modElement.classList.add("mod-item");
 
-        if (!response.ok) {
-            throw new Error("Failed to load mods.json. Status: " + response.status);
-        }
+    modElement.innerHTML = `
+      <h2>${mod.name}</h2>
+      <p>${mod.description}</p>
+      <a href="${mod.download}" class="btn" ${mod.premium ? "style='background-color: #ffc107;'" : ""}>Download</a>
+    `;
 
-        const mods = await response.json();
-        console.log("Mods loaded successfully:", mods);
-
-        // Vérification de l'élément mods-container
-        const modsContainer = document.getElementById("mods-container");
-        if (!modsContainer) {
-            throw new Error("Element #mods-container not found in the DOM.");
-        }
-
-        modsContainer.innerHTML = ""; // Nettoyer avant d'ajouter les mods
-
-        mods.forEach(mod => {
-            const modElement = document.createElement("div");
-            modElement.classList.add("mod-item");
-
-            if (mod.premium && !isPremiumUser) {
-                modElement.innerHTML = `
-                    <h2>${mod.name}</h2>
-                    <p>${mod.description}</p>
-                    <button class="btn" disabled>Premium Access Required</button>
-                `;
-            } else {
-                modElement.innerHTML = `
-                    <h2>${mod.name}</h2>
-                    <p>${mod.description}</p>
-                    <a href="${mod.download}" class="btn">Download</a>
-                `;
-            }
-
-            modsContainer.appendChild(modElement);
-        });
-
-        console.log("Mods successfully loaded and displayed.");
-
-    } catch (error) {
-        console.error("Error loading mods:", error);
-        alert("Failed to load mods. Please try again later.");
-    }
+    modsContainer.appendChild(modElement);
+  });
 }
