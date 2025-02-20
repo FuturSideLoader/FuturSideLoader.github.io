@@ -44,15 +44,17 @@ async function getPremiumStatus() {
 }
 
 function downloadGame(url, isPremiumGame) {
+    const isPremiumUser = localStorage.getItem("premium") === "true";
     if (isPremiumGame && !isPremiumUser) {
         alert("You must have a paid plan to download.");
     } else {
-        window.open(url, '_blank');
+        window.open(url, '_blank'); // Ouvre l'URL dans un nouvel onglet
     }
 }
 
 // Ajoute la fonction downloadGame à window pour qu'elle soit accessible globalement
 window.downloadGame = downloadGame;
+
 
 // Charge les jeux depuis Firestore au chargement de la page
 window.onload = loadGames;
