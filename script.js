@@ -1,7 +1,24 @@
-let isPremiumUser = false; // Variable globale pour stocker le statut premium
-
 // Initialise Firebase (assure-toi que Firebase est bien importé dans index.html)
-const db = firebase.firestore();
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+// Configuration de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
+    authDomain: "futursideloader.firebaseapp.com",
+    projectId: "futursideloader",
+    storageBucket: "futursideloader.firebasestorage.app",
+    messagingSenderId: "426216859785",
+    appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
+};
+
+// Initialisation de Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let isPremiumUser = false; // Variable globale pour stocker le statut premium
 
 async function loadGames() {
     try {
@@ -11,7 +28,7 @@ async function loadGames() {
         isPremiumUser = await getPremiumStatus(); // Vérifie si l'utilisateur est premium
 
         // Récupérer les jeux depuis Firestore
-        const querySnapshot = await db.collection("games").get();
+        const querySnapshot = await getDocs(collection(db, "games"));
 
         querySnapshot.forEach(doc => {
             const game = doc.data();
