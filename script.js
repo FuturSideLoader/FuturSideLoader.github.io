@@ -1,22 +1,4 @@
-// Initialise Firebase (assure-toi que Firebase est bien importé dans index.html)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-// Configuration de Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
-    authDomain: "futursideloader.firebaseapp.com",
-    projectId: "futursideloader",
-    storageBucket: "futursideloader.firebasestorage.app",
-    messagingSenderId: "426216859785",
-    appId: "1:426216859785:web:2e8aca2b6f38a0856ffe58"
-};
-
-// Initialisation de Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app); // Récupère l'instance Firestore
-const auth = getAuth(app);
+// Ne pas inclure Firebase ici, on l'a déjà fait dans index.html
 
 let isPremiumUser = false; // Variable globale pour stocker le statut premium
 
