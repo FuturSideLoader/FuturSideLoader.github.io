@@ -25,8 +25,8 @@
     <!-- Firebase SDK en mode module -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
         // Configuration Firebase
         const firebaseConfig = {
@@ -44,7 +44,7 @@
         const db = getFirestore(app);
 
         // Vérifier l'état de connexion de l'utilisateur
-        auth.onAuthStateChanged(async (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 console.log("✅ Utilisateur connecté :", user.email);
 
@@ -52,10 +52,10 @@
                 document.getElementById('user-email').textContent = `👤 ${user.email}`;
 
                 // Récupérer les infos de l'utilisateur dans Firestore
-                const userRef = db.collection("users").doc(user.uid);
-                const userSnap = await userRef.get();
+                const userRef = doc(db, "users", user.uid);  // Syntaxe modulaire
+                const userSnap = await getDoc(userRef); // Utiliser getDoc pour récupérer un document
 
-                if (userSnap.exists) {
+                if (userSnap.exists()) {
                     const userData = userSnap.data();
                     const isPremium = userData.subscriptionStatus === "Premium";
                     console.log("🛡️ Statut premium :", isPremium);
