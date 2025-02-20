@@ -17,13 +17,14 @@ async function loadGames() {
             const gameCard = document.createElement("div");
             gameCard.classList.add("game-card");
 
-            const buttonText = game.premium && !isPremiumUser ? "Upgrade to a paid plan to download" : "Download";
+            const buttonText = game.premium && !isPremiumUser ? "Upgrade to a paid plan to download" : "Go to download page";
 
+            // Ajouter la logique pour afficher le bon bouton
             gameCard.innerHTML = `
                 <img src="${game.cover}" alt="${game.name} Cover">
                 <h2>${game.name}</h2>
                 <button onclick="downloadGame('${game.download}', ${game.premium})">
-                    ${isPremiumUser && game.premium ? "Download" : buttonText}
+                    ${isPremiumUser && game.premium ? "Go to download page" : buttonText}
                 </button>
             `;
 
@@ -44,9 +45,11 @@ async function getPremiumStatus() {
 }
 
 function downloadGame(url, isPremiumGame) {
+    // Si l'utilisateur est premium et le jeu est premium
     if (isPremiumGame && !isPremiumUser) {
         alert("You must have a paid plan to download.");
     } else {
+        // Ouvre l'URL dans un nouvel onglet (pour un lien de téléchargement ou une page)
         window.open(url, '_blank');
     }
 }
