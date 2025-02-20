@@ -43,62 +43,34 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Vérifier l'état de connexion de l'utilisateur
+        let isPremiumUser = false; // Variable globale
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log("✅ Utilisateur connecté :", user.email);
-
-                // Afficher l'email de l'utilisateur
-                document.getElementById('user-email').textContent = `👤 ${user.email}`;
-
-                // Récupérer les infos de l'utilisateur dans Firestore
-                const userRef = doc(db, "users", user.uid);  // Syntaxe modulaire
-                const userSnap = await getDoc(userRef); // Utiliser getDoc pour récupérer un document
-
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
-                    const isPremium = userData.subscriptionStatus === "Premium";
-                    console.log("🛡️ Statut premium :", isPremium);
-                    localStorage.setItem("premium", isPremium);
+                    isPremiumUser = userData.subscriptionStatus === "Premium";
+                    localStorage.setItem("premium", isPremiumUser);
                 }
-
-                // Masquer les boutons Log in et Create account
-                document.getElementById('login-btn').style.display = 'none';
-                document.getElementById('signup-btn').style.display = 'none';
-
-                // Afficher les boutons "My account" et "Mods"
-                document.getElementById('my-account-btn').style.display = 'inline-block';
-                document.getElementById('mods-btn').style.display = 'inline-block';
+                document.getElementById('user-email').textContent = `👤 ${user.email}`;
             } else {
-                console.log("❌ Aucun utilisateur connecté !");
-                localStorage.setItem("premium", "false");
-                document.getElementById('user-email').textContent = ""; // Effacer l'email si non connecté
-
-                // Afficher les boutons Log in et Create account
-                document.getElementById('login-btn').style.display = 'block';
-                document.getElementById('signup-btn').style.display = 'block';
-
-                // Cacher les boutons "My account" et "Mods"
-                document.getElementById('my-account-btn').style.display = 'none';
-                document.getElementById('mods-btn').style.display = 'none';
+                isPremiumUser = false;
+                document.getElementById('user-email').textContent = "";
             }
+
+            loadGames(isPremiumUser);  // Charge les jeux après avoir mis à jour le statut premium
         });
 
-        async function loadGames() {
+        async function loadGames(isPremiumUser) {
             try {
-                // Récupérer les jeux depuis Firestore en utilisant la syntaxe modulaire
-                const gamesRef = collection(db, "games");
-                const snapshot = await getDocs(gamesRef);
-                const games = snapshot.docs.map(doc => doc.data());
                 const container = document.getElementById("game-container");
+                container.innerHTML = "";  // Vider le conteneur
 
-                // Vider le conteneur pour éviter les doublons
-                container.innerHTML = "";
-
-                // Récupérer et stocker le statut premium
-                const isPremiumUser = localStorage.getItem("premium") === "true";
-
-                games.forEach(game => {
+                const snapshot = await getDocs(collection(db, "games"));
+                snapshot.forEach(doc => {
+                    const game = doc.data();
                     const gameCard = document.createElement("div");
                     gameCard.classList.add("game-card");
 
@@ -114,7 +86,6 @@
 
                     container.appendChild(gameCard);
                 });
-
             } catch (error) {
                 console.error("Erreur lors du chargement des jeux", error);
             }
@@ -128,8 +99,6 @@
                 window.open(url, '_blank');
             }
         }
-
-        window.onload = loadGames;
     </script>
 
     <footer>
@@ -142,11 +111,5 @@
             <p>&copy; 2025 FutureSideLoader</p>
         </div>
     </footer>
-
-
-    
-
-
-
 </body>
 </html>
