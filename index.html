@@ -22,12 +22,12 @@
         <div id="game-container"></div> <!-- Conteneur pour les jeux -->
     </main>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <!-- Firebase SDK en mode module -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-    <script>
         // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDVibu5Mv4R_RGwueA-hRG_7D889FXqWR8",
@@ -39,12 +39,12 @@
         };
 
         // Initialisation Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
         // Vérifier l'état de connexion de l'utilisateur
-        firebase.auth().onAuthStateChanged(async (user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 console.log("✅ Utilisateur connecté :", user.email);
 
